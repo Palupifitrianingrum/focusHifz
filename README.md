@@ -1,4 +1,4 @@
-# HifzFlow (Flutter) — Focus Mode + Cek Bacaan Suara
+# focusHifz
 
 Struktur:
 - `app/lib/` : kode Flutter (UI/UX HifzFlow, hafalan, LCC, tajwid, sertifikasi)
