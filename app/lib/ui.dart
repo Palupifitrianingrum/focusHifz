@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'app_state.dart';
 import 'data.dart';
+import 'murottal.dart';
+import 'quran_api.dart';
 import 'theme.dart';
 
 double clampD(double x, double a, double b) => x < a ? a : (x > b ? b : x);
@@ -45,17 +47,18 @@ class HCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       side: BorderSide(color: border ?? pl.line),
     );
+    final card = Material(
+      color: color ?? pl.card,
+      shape: shape,
+      child: InkWell(
+        customBorder: shape,
+        onTap: onTap,
+        child: Padding(padding: padding, child: child),
+      ),
+    );
     return Padding(
       padding: margin,
-      child: Material(
-        color: color ?? pl.card,
-        shape: shape,
-        child: InkWell(
-          customBorder: shape,
-          onTap: onTap,
-          child: Padding(padding: padding, child: child),
-        ),
-      ),
+      child: onTap == null ? card : FocusRing(radius: 16, child: card),
     );
   }
 }
@@ -64,15 +67,18 @@ class NavCard extends StatelessWidget {
   final String title;
   final String sub;
   final VoidCallback onTap;
-  final String? emoji;
+  // final String? emoji; // emoji diganti ikon: tampil beda di tiap HP dan tidak punya label (antislop R-04)
+  final IconData? icon;
   final Color? border;
+  final String? trailing;
   const NavCard({
     super.key,
     required this.title,
     required this.sub,
     required this.onTap,
-    this.emoji,
+    this.icon,
     this.border,
+    this.trailing,
   });
 
   @override
@@ -82,8 +88,8 @@ class NavCard extends StatelessWidget {
       onTap: onTap,
       border: border,
       child: Row(children: [
-        if (emoji != null) ...[
-          Text(emoji!, style: const TextStyle(fontSize: 28)),
+        if (icon != null) ...[
+          IconBadge(icon!),
           const SizedBox(width: 12),
         ],
         Expanded(
@@ -93,8 +99,34 @@ class NavCard extends StatelessWidget {
             Text(sub, style: TextStyle(color: pl.muted, fontSize: 14)),
           ]),
         ),
-        Text('›', style: TextStyle(fontSize: 22, color: pl.muted)),
+        if (trailing != null) ...[
+          const SizedBox(width: 8),
+          Bdg(trailing!),
+        ],
+        ExcludeSemantics(child: Icon(Icons.chevron_right, color: pl.muted)),
       ]),
+    );
+  }
+}
+
+/// Ikon di dalam kotak hijau muda. Motif identitas: bentuk kotak bersudut 12
+/// sama dengan tombol ikon dan nomor surah, supaya ikon tidak terlihat "lepas".
+class IconBadge extends StatelessWidget {
+  final IconData icon;
+  final double size;
+  const IconBadge(this.icon, {super.key, this.size = 40});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: pl.green.withValues(alpha: .12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, color: pl.green, size: size * .55),
     );
   }
 }
@@ -116,7 +148,7 @@ class HButton extends StatelessWidget {
     switch (kind) {
       case BK.fill:
         bg = pl.green;
-        fg = Colors.white;
+        fg = pl.onAccent; // tema gelap: teks gelap, putih hanya 3.48:1 di hijau terang
         break;
       case BK.gold:
         bg = pl.gold;
@@ -133,6 +165,7 @@ class HButton extends StatelessWidget {
     }
     final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(14));
     const pad = EdgeInsets.symmetric(vertical: 14, horizontal: 16);
+    const minSize = Size(0, 48);
     const ts = TextStyle(fontSize: 15, fontWeight: FontWeight.w600);
     final Widget btn;
     if (kind == BK.outline) {
@@ -143,8 +176,12 @@ class HButton extends StatelessWidget {
           disabledForegroundColor: fg.withValues(alpha: .4),
           side: BorderSide(color: onPressed == null ? fg.withValues(alpha: .4) : fg, width: 1.5),
           padding: pad,
+          minimumSize: minSize,
           shape: shape,
           textStyle: ts,
+        ).copyWith(
+          side: focusSide(
+              pl, BorderSide(color: onPressed == null ? fg.withValues(alpha: .4) : fg, width: 1.5)),
         ),
         child: Text(label, textAlign: TextAlign.center),
       );
@@ -157,9 +194,10 @@ class HButton extends StatelessWidget {
           disabledBackgroundColor: bg.withValues(alpha: .4),
           disabledForegroundColor: fg.withValues(alpha: .8),
           padding: pad,
+          minimumSize: minSize,
           shape: shape,
           textStyle: ts,
-        ),
+        ).copyWith(side: focusSide(pl)),
         child: Text(label, textAlign: TextAlign.center),
       );
     }
@@ -179,22 +217,40 @@ class HChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(99),
+      side: BorderSide(color: on ? pl.green : pl.line, width: 1.5),
+    );
+    // Dulu GestureDetector tinggi ~34px tanpa peran tombol; sekarang tombol asli,
+    // tinggi minimal 44px, bisa difokus keyboard, dan status terpilih dibacakan.
     return Padding(
       padding: const EdgeInsets.only(right: 6, bottom: 6),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: on ? pl.green : pl.card,
-            border: Border.all(color: on ? pl.green : pl.line, width: 1.5),
-            borderRadius: BorderRadius.circular(99),
+      child: Semantics(
+        button: true,
+        selected: on,
+        child: FocusRing(
+          radius: 99,
+          child: Material(
+          color: on ? pl.green : pl.card,
+          shape: shape,
+          child: InkWell(
+            customBorder: shape,
+            onTap: onTap,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: kTap),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(label,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: on ? pl.onAccent : pl.text)),
+                ]),
+              ),
+            ),
           ),
-          child: Text(label,
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: on ? Colors.white : pl.text)),
+          ),
         ),
       ),
     );
@@ -349,20 +405,30 @@ class Seg extends StatelessWidget {
       child: Row(children: [
         for (var i = 0; i < labels.length; i++)
           Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(i),
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: i == index ? pl.card : null,
+            child: Semantics(
+              button: true,
+              selected: i == index,
+              child: FocusRing(
+                radius: 11,
+                child: Material(
+                color: i == index ? pl.card : Colors.transparent,
+                borderRadius: BorderRadius.circular(11),
+                child: InkWell(
                   borderRadius: BorderRadius.circular(11),
+                  onTap: () => onChanged(i),
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: kTap),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                    child: Text(labels[i],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: i == index ? pl.green : pl.muted)),
+                  ),
                 ),
-                child: Text(labels[i],
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: i == index ? pl.green : pl.muted)),
+              ),
               ),
             ),
           ),
@@ -387,31 +453,43 @@ class SpinRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
-    Widget btn(String t, VoidCallback f) => GestureDetector(
-          onTap: f,
-          child: Container(
-            width: 36,
-            height: 36,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: pl.card,
-              border: Border.all(color: pl.line),
-              borderRadius: BorderRadius.circular(11),
+    Widget btn(IconData ic, String name, VoidCallback f) {
+      final shape = RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: pl.line),
+      );
+      return Tooltip(
+        message: name,
+        child: FocusRing(
+          radius: 12,
+          child: Material(
+            color: pl.card,
+            shape: shape,
+            child: InkWell(
+              customBorder: shape,
+              onTap: f,
+              child: SizedBox(
+                width: kTap,
+                height: kTap,
+                child: Icon(ic, size: 20, color: pl.text, semanticLabel: name),
+              ),
             ),
-            child: Text(t, style: const TextStyle(fontSize: 18)),
           ),
-        );
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(children: [
         Expanded(child: Text(label)),
-        btn('−', onMinus),
+        btn(Icons.remove, 'Kurangi $label', onMinus),
         Container(
           constraints: const BoxConstraints(minWidth: 44),
           alignment: Alignment.center,
           child: Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
         ),
-        btn('+', onPlus),
+        btn(Icons.add, 'Tambah $label', onPlus),
       ]),
     );
   }
@@ -420,22 +498,35 @@ class SpinRow extends StatelessWidget {
 class HIconBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const HIconBtn({super.key, required this.icon, required this.onTap});
+
+  /// Nama tombol untuk pembaca layar dan tooltip (tombol ikon wajib punya nama).
+  final String label;
+  const HIconBtn({super.key, required this.icon, required this.onTap, required this.label});
 
   @override
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: BorderSide(color: pl.line),
+    );
+    return Tooltip(
+      message: label,
+      child: FocusRing(
+        radius: 12,
+        child: Material(
           color: pl.card,
-          border: Border.all(color: pl.line),
-          borderRadius: BorderRadius.circular(12),
+          shape: shape,
+          child: InkWell(
+            customBorder: shape,
+            onTap: onTap,
+            child: SizedBox(
+              width: kTap,
+              height: kTap,
+              child: Icon(icon, size: 22, color: pl.text, semanticLabel: label),
+            ),
+          ),
         ),
-        child: Icon(icon, size: 22, color: pl.text),
       ),
     );
   }
@@ -444,7 +535,8 @@ class HIconBtn extends StatelessWidget {
 class PageHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onBack;
-  const PageHeader(this.title, {super.key, this.onBack});
+  final List<Widget> actions;
+  const PageHeader(this.title, {super.key, this.onBack, this.actions = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -453,9 +545,11 @@ class PageHeader extends StatelessWidget {
       child: Row(children: [
         HIconBtn(
             icon: Icons.chevron_left,
+            label: 'Kembali',
             onTap: onBack ?? () => Navigator.of(context).maybePop()),
-        const SizedBox(width: 8),
-        Expanded(child: Text(title, style: serif(19))),
+        const SizedBox(width: 10),
+        Expanded(child: Semantics(header: true, child: Text(title, style: serif(19)))),
+        ...actions,
       ]),
     );
   }
@@ -467,7 +561,10 @@ class H4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(top: 18, bottom: 8),
-        child: Text(text, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        child: Semantics(
+          header: true,
+          child: Text(text, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+        ),
       );
 }
 
@@ -526,7 +623,7 @@ class AyatText extends StatelessWidget {
           spans.add(TextSpan(text: '${surahs[s].a[n - 1]} '));
           spans.add(TextSpan(
               text: '\uFD3F$n\uFD3E ',
-              style: TextStyle(fontSize: sz * .6, color: pl.gold)));
+              style: TextStyle(fontSize: sz * .6, color: pl.goldInk)));
         }
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -552,6 +649,15 @@ class Waveform extends StatefulWidget {
 class _WaveformState extends State<Waveform> with SingleTickerProviderStateMixin {
   late final AnimationController _c =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Animasi gelombang berhenti bila pengguna mematikan animasi di pengaturan HP.
+    final still = MediaQuery.of(context).disableAnimations;
+    if (still && _c.isAnimating) _c.stop();
+    if (!still && !_c.isAnimating) _c.repeat();
+  }
 
   @override
   void dispose() {
@@ -656,4 +762,296 @@ Future<void> showHSheet(
       ),
     ),
   );
+}
+
+// ===== Status data: memuat, kosong, gagal (antislop R-27) =====
+class LoadingState extends StatelessWidget {
+  final String text;
+  const LoadingState(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      child: Semantics(
+        liveRegion: true,
+        child: Column(children: [
+          const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 3)),
+          const SizedBox(height: 12),
+          Muted(text, align: TextAlign.center),
+        ]),
+      ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  final String text;
+  const EmptyState(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 12),
+        child: Muted(text, align: TextAlign.center),
+      );
+}
+
+class ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  const ErrorState({super.key, required this.message, this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    return HCard(
+      color: kBadBg,
+      border: pl.red,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.error_outline, color: kBadFg, size: 20),
+          SizedBox(width: 8),
+          Text('Gagal memuat', style: TextStyle(color: kBadFg, fontWeight: FontWeight.w700)),
+        ]),
+        const SizedBox(height: 4),
+        Semantics(
+          liveRegion: true,
+          child: Text(message, style: const TextStyle(color: kBadFg)),
+        ),
+        if (onRetry != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OutlinedButton(
+                onPressed: onRetry,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kBadFg,
+                  side: const BorderSide(color: kBadFg, width: 1.5),
+                  minimumSize: const Size(0, kTap),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ).copyWith(side: focusSide(pl, const BorderSide(color: kBadFg, width: 1.5))),
+                child: const Text('Coba lagi'),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+/// Tombol kecil di dalam kartu (Ganti, Hapus). Tinggi tetap 44px.
+class SmallButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final bool danger;
+  final IconData? icon;
+  const SmallButton({super.key, required this.label, this.onPressed, this.danger = false, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    final fg = danger ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFF8A80) : kBadFg) : pl.green;
+    final style = OutlinedButton.styleFrom(
+      foregroundColor: fg,
+      side: BorderSide(color: fg, width: 1.5),
+      minimumSize: const Size(0, kTap),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+    ).copyWith(side: focusSide(pl, BorderSide(color: fg, width: 1.5)));
+    if (icon != null) {
+      return OutlinedButton.icon(
+          onPressed: onPressed, style: style, icon: Icon(icon, size: 18), label: Text(label));
+    }
+    return OutlinedButton(onPressed: onPressed, style: style, child: Text(label));
+  }
+}
+
+class SearchField extends StatelessWidget {
+  final String label;
+  final ValueChanged<String> onChanged;
+  const SearchField({super.key, required this.label, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    OutlineInputBorder b(Color c) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c, width: 1.5),
+        );
+    return TextField(
+      onChanged: onChanged,
+      textInputAction: TextInputAction.search,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: pl.muted),
+        prefixIcon: Icon(Icons.search, color: pl.muted),
+        filled: true,
+        fillColor: pl.card,
+        border: b(pl.line),
+        enabledBorder: b(pl.line),
+        focusedBorder: b(pl.green),
+      ),
+    );
+  }
+}
+
+/// Nomor surah dalam bingkai belah ketupat emas: motif bingkai mushaf yang sama
+/// dengan garis emas di kartu ayat. Dipakai di daftar surah.
+class SurahNumber extends StatelessWidget {
+  final int n;
+  final double size;
+  const SurahNumber(this.n, {super.key, this.size = 42});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(alignment: Alignment.center, children: [
+        Transform.rotate(
+          angle: math.pi / 4,
+          child: Container(
+            width: size * .7,
+            height: size * .7,
+            decoration: BoxDecoration(
+              border: Border.all(color: pl.gold, width: 1.5),
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ),
+        Text('$n',
+            style: TextStyle(fontSize: n > 99 ? 12 : 13, fontWeight: FontWeight.w700, color: pl.text)),
+      ]),
+    );
+  }
+}
+
+// ===== Pemutar murottal mini (tampil di bawah layar selama audio berjalan) =====
+class PlayerBar extends StatelessWidget {
+  const PlayerBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    return AnimatedBuilder(
+      animation: Listenable.merge(<Listenable>[
+        murottal.current,
+        murottal.playing,
+        murottal.loading,
+        murottal.error,
+        app,
+      ]),
+      builder: (context, _) {
+        final cur = murottal.current.value;
+        final err = murottal.error.value;
+        if (cur == null && err == null) return const SizedBox.shrink();
+        Widget body;
+        if (cur == null) {
+          body = Row(children: [
+            const Icon(Icons.error_outline, color: kBadFg),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Semantics(
+                liveRegion: true,
+                child: Text(err!, style: const TextStyle(color: kBadFg, fontSize: 13)),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Tutup pesan',
+              onPressed: () => murottal.error.value = null,
+              icon: const Icon(Icons.close, color: kBadFg),
+            ),
+          ]);
+          return Material(
+            color: kBadBg,
+            child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.fromLTRB(16, 6, 6, 6), child: body)),
+          );
+        }
+        final name = QuranApi.chapterSync(cur.s)?.name ?? 'Surah ${cur.s}';
+        final what = cur.isBasmalah ? 'Basmalah' : 'Ayat ${cur.a}';
+        body = Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Text('$name · $what',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(murottal.loading.value ? 'Memuat audio…' : app.reciterName,
+                  maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: pl.muted, fontSize: 13)),
+            ]),
+          ),
+          IconButton(
+            tooltip: 'Ayat sebelumnya',
+            onPressed: () => murottal.skip(-1),
+            icon: const Icon(Icons.skip_previous),
+          ),
+          IconButton.filled(
+            tooltip: murottal.playing.value ? 'Jeda' : 'Putar',
+            style: IconButton.styleFrom(backgroundColor: pl.green, foregroundColor: pl.onAccent),
+            onPressed: murottal.toggle,
+            icon: Icon(murottal.playing.value ? Icons.pause : Icons.play_arrow),
+          ),
+          IconButton(
+            tooltip: 'Ayat berikutnya',
+            onPressed: () => murottal.skip(1),
+            icon: const Icon(Icons.skip_next),
+          ),
+          IconButton(
+            tooltip: 'Hentikan murottal',
+            onPressed: () => murottal.stop(),
+            icon: const Icon(Icons.stop),
+          ),
+        ]);
+        return Material(
+          color: pl.card,
+          child: Container(
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: pl.gold, width: 2))),
+            child: SafeArea(
+              top: false,
+              child: Padding(padding: const EdgeInsets.fromLTRB(16, 4, 4, 4), child: body),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Cincin fokus keyboard 3px untuk kontrol buatan sendiri (InkWell).
+/// Hanya tampil saat navigasi pakai keyboard, tidak saat disentuh (antislop R-32).
+class FocusRing extends StatefulWidget {
+  final Widget child;
+  final double radius;
+  const FocusRing({super.key, required this.child, this.radius = 14});
+  @override
+  State<FocusRing> createState() => _FocusRingState();
+}
+
+class _FocusRingState extends State<FocusRing> {
+  bool _on = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final pl = Pal.of(context);
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onFocusChange: (f) {
+        final kb = FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+        if (mounted) setState(() => _on = f && kb);
+      },
+      child: Container(
+        foregroundDecoration: _on
+            ? BoxDecoration(
+                border: Border.all(color: pl.focus, width: 3),
+                borderRadius: BorderRadius.circular(widget.radius),
+              )
+            : null,
+        child: widget.child,
+      ),
+    );
+  }
 }

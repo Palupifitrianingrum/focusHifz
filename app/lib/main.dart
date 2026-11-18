@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'app_state.dart';
 import 'pages/tabs.dart';
+import 'quran_api.dart';
 import 'theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await app.load(); // nama, tema, qari, dan posisi baca yang tersimpan
+  await QuranApi.warmCache();
   runApp(const HifzFlowApp());
 }
 

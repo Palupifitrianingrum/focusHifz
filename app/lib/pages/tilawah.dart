@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../app_state.dart';
 import '../data.dart';
+import '../tajweed.dart';
 import '../theme.dart';
 import '../ui.dart';
 import 'quiz.dart';
@@ -339,6 +340,12 @@ class _TajwidPageState extends State<TajwidPage> {
             const PageHeader('Belajar tajwid'),
             const Muted('Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.'),
             const SizedBox(height: 10),
+            NavCard(
+              icon: Icons.palette_outlined,
+              title: 'Warna hukum tajwid di Mushaf',
+              sub: 'Arti tiap warna saat membaca. Di Mushaf, ketuk huruf berwarna untuk penjelasannya.',
+              onTap: () => showLegendSheet(context),
+            ),
             for (var i = 0; i < tajwid.length; i++)
               HCard(
                 onTap: () => setState(() => open = open == i ? -1 : i),
@@ -347,7 +354,10 @@ class _TajwidPageState extends State<TajwidPage> {
                     Expanded(
                         child: Text(tajwid[i][0],
                             style: const TextStyle(fontWeight: FontWeight.w700))),
-                    Text(open == i ? '−' : '+', style: const TextStyle(fontSize: 18)),
+                    ExcludeSemantics(
+                      child: Icon(open == i ? Icons.expand_less : Icons.expand_more,
+                          color: Pal.of(context).muted),
+                    ),
                   ]),
                   if (open == i)
                     Padding(padding: const EdgeInsets.only(top: 6), child: Text(tajwid[i][1])),

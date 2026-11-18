@@ -272,7 +272,7 @@ class _QuizPageState extends State<QuizPage> {
               Muted('Soal ${i + 1}/${l.length}', size: 13),
               const Spacer(),
               if (tm) ...[
-                Bdg('⏱ ${left}d', kind: 'y'),
+                Bdg('Sisa $left detik', kind: 'y'),
                 const SizedBox(width: 6),
                 Bdg('Streak $st', kind: 'g'),
                 const SizedBox(width: 6),
@@ -311,21 +311,35 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  Widget _wordChip(String w, VoidCallback? onTap, Pal pl) => Padding(
-        padding: const EdgeInsets.all(3),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: pl.card,
-              border: Border.all(color: pl.line, width: 1.5),
-              borderRadius: BorderRadius.circular(99),
+  Widget _wordChip(String w, VoidCallback? onTap, Pal pl) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: BorderSide(color: pl.line, width: 1.5),
+    );
+    return Padding(
+      padding: const EdgeInsets.all(3),
+      child: Semantics(
+        button: onTap != null,
+        child: FocusRing(
+          radius: 12,
+          child: Material(
+          color: pl.card,
+          shape: shape,
+          child: InkWell(
+            customBorder: shape,
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: kTap, minWidth: kTap),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              alignment: Alignment.center,
+              child: Text(w, style: arabic(24, color: pl.text, height: 1.6)),
             ),
-            child: Text(w, style: arabic(24, color: pl.text, height: 1.6)),
           ),
         ),
-      );
+        ),
+      ),
+    );
+  }
 
   Widget _opt(Pal pl, Question q, int x, bool answered) {
     Color bg = pl.card, bc = pl.line, fg = pl.text;
@@ -339,9 +353,18 @@ class _QuizPageState extends State<QuizPage> {
       fg = kBadFg;
     }
     final isAr = q.o[x].runes.any((r) => r >= 0x0600 && r <= 0x06FF);
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+      side: BorderSide(color: bc, width: 1.5),
+    );
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: GestureDetector(
+      child: FocusRing(
+        child: Material(
+        color: bg,
+        shape: shape,
+        child: InkWell(
+        customBorder: shape,
         onTap: answered
             ? null
             : () => setState(() {
@@ -350,12 +373,8 @@ class _QuizPageState extends State<QuizPage> {
                 }),
         child: Container(
           padding: const EdgeInsets.all(13),
+          constraints: const BoxConstraints(minHeight: 48),
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: bg,
-            border: Border.all(color: bc, width: 1.5),
-            borderRadius: BorderRadius.circular(14),
-          ),
           child: Directionality(
             textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
             child: Text(q.o[x],
@@ -364,6 +383,8 @@ class _QuizPageState extends State<QuizPage> {
                     ? arabic(24, color: fg, height: 1.8)
                     : TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: fg)),
           ),
+        ),
+        ),
         ),
       ),
     );
@@ -550,7 +571,14 @@ class _SertifikasiPageState extends State<SertifikasiPage> {
                       for (final x in reqs)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Text('${x[1] == true ? '✅' : '⬜'} ${x[0]}'),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Icon(x[1] == true ? Icons.check_box : Icons.check_box_outline_blank,
+                                size: 20,
+                                color: x[1] == true ? pl.green : pl.muted,
+                                semanticLabel: x[1] == true ? 'Terpenuhi' : 'Belum'),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text('${x[0]}')),
+                          ]),
                         ),
                     ]),
                   ),
@@ -575,7 +603,7 @@ class _SertifikasiPageState extends State<SertifikasiPage> {
                 else
                   for (var i = 0; i < app.certs.length; i++)
                     NavCard(
-                      emoji: '🎓',
+                      icon: Icons.workspace_premium_outlined,
                       title: _levels[app.certs[i].lv].n,
                       sub: '${app.certs[i].no} · ${app.certs[i].d}',
                       onTap: () => pushPage(context, CertPage(index: i)),
@@ -594,7 +622,8 @@ class UjianPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void pv() => toast(context, 'Preview: belum terhubung ke backend');
+    // TODO: ketiga ujian ini belum punya backend; kartunya diberi label "Segera".
+    void pv() => toast(context, 'Belum tersedia: ujian ini butuh penguji dan server.');
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -607,12 +636,17 @@ class UjianPage extends StatelessWidget {
                 title: 'Ujian sambung ayat',
                 sub: '5 soal sambung ayat. Sudah berfungsi.',
                 onTap: () => pushPage(context, const QuizPage(kind: 'ujian'))),
-            NavCard(title: 'Ujian hafalan', sub: 'Setor hafalan ke penguji. Preview.', onTap: pv),
             NavCard(
-                title: 'Ujian kelancaran', sub: 'Penilaian kelancaran bacaan. Preview.', onTap: pv),
+                title: 'Ujian hafalan', sub: 'Setor hafalan ke penguji.', trailing: 'Segera', onTap: pv),
+            NavCard(
+                title: 'Ujian kelancaran',
+                sub: 'Penilaian kelancaran bacaan.',
+                trailing: 'Segera',
+                onTap: pv),
             NavCard(
                 title: 'Penilaian penguji manusia',
-                sub: 'Penguji menilai rekaman Anda. Preview.',
+                sub: 'Penguji menilai rekamanmu.',
+                trailing: 'Segera',
                 onTap: pv),
           ],
         ),
@@ -669,10 +703,11 @@ class CertPage extends StatelessWidget {
             const Muted(
                 "Sertifikat ini adalah sertifikasi kompetensi internal HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an.",
                 size: 13),
+            // TODO: bagikan sertifikat setelah layanan verifikasi tersedia.
             HButton(
-                label: 'Bagikan (preview)',
+                label: 'Bagikan (segera)',
                 kind: BK.outline,
-                onPressed: () => toast(context, 'Preview: belum terhubung ke backend')),
+                onPressed: () => toast(context, 'Belum tersedia: menunggu layanan verifikasi sertifikat.')),
           ],
         ),
       ),

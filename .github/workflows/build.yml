@@ -20,7 +20,7 @@ jobs:
       - name: Generate Android scaffold and apply app code
         run: |
           flutter create --org com.fokus --project-name fokus_hafalan --platforms android .
-          flutter pub add speech_to_text:^7.0.0 google_fonts
+          flutter pub add speech_to_text:^7.0.0 google_fonts http path_provider just_audio
           rm -f test/widget_test.dart
           rm -rf lib && mkdir lib
           cp -r app/lib/. lib/
