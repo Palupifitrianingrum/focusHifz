@@ -519,7 +519,7 @@ class _SertifikasiPageState extends State<SertifikasiPage> {
                         style: TextStyle(fontWeight: FontWeight.w700)),
                     SizedBox(height: 4),
                     Muted(
-                        "Program penilaian kemampuan hafalan di HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum."),
+                        "Program penilaian kemampuan hafalan di focusHifz. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum."),
                   ]),
                 ),
                 const H4('Jenjang'),
@@ -646,7 +646,7 @@ class CertPage extends StatelessWidget {
                 style: const TextStyle(color: ink, fontSize: 15),
                 textAlign: TextAlign.center,
                 child: Column(children: [
-                  const Text('HifzFlow · Sertifikat kompetensi internal',
+                  const Text('focusHifz · Sertifikat kompetensi internal',
                       style: TextStyle(fontSize: 12, color: Color(0xFF667A71))),
                   const SizedBox(height: 10),
                   Text('Sertifikat Kompetensi', style: serif(24, color: Pal.light.green2)),
@@ -667,7 +667,7 @@ class CertPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Muted(
-                "Sertifikat ini adalah sertifikasi kompetensi internal HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an.",
+                "Sertifikat ini adalah sertifikasi kompetensi internal focusHifz. Bukan ijazah dan bukan sanad Al-Qur'an.",
                 size: 13),
             HButton(
                 label: 'Bagikan (preview)',

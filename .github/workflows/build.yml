@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -29,9 +29,9 @@ jobs:
           M=android/app/src/main/AndroidManifest.xml
           sed -i '/<manifest/a <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.INTERNET"/>' $M
           if grep -q '<queries>' $M; then sed -i '/<queries>/a <intent><action android:name="android.speech.RecognitionService"/></intent>' $M; fi
-          sed -i 's/android:label="fokus_hafalan"/android:label="HifzFlow"/' $M
+          sed -i 's/android:label="fokus_hafalan"/android:label="focusHifz"/' $M
       - run: flutter build apk --release
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/flutter-apk/app-release-v3.apk

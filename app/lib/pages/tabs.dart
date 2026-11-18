@@ -412,7 +412,7 @@ class ProfTab extends StatelessWidget {
                 ]),
               ]),
             ),
-            const Muted('HifzFlow · data contoh', align: TextAlign.center, size: 13),
+            const Muted('focusHifz · data contoh', align: TextAlign.center, size: 13),
           ],
         );
       },

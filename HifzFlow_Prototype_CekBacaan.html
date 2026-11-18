@@ -1,241 +1,1872 @@
-<!DOCTYPE html>
-<html lang="id"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HifzFlow – Prototype + Cek Bacaan Suara</title>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fraunces:wght@600&display=swap" rel="stylesheet">
-<style>
-:root{--g:#0f5c4a;--g2:#0a3d31;--c:#f7f1e3;--w:#fffdf7;--au:#c9a24b;--t:#1d2b26;--m:#667a71;--r:#c0392b;--y:#d9a400;--ok:#1e8e5a;--ln:#e6dcc3;--az:30px;color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--c:#0e1915;--w:#16251f;--t:#efe9d8;--m:#9fb0a8;--ln:#2a3d35;--g:#2f9a7c;color-scheme:dark}}
-:root[data-theme=dark]{--c:#0e1915;--w:#16251f;--t:#efe9d8;--m:#9fb0a8;--ln:#2a3d35;--g:#2f9a7c;color-scheme:dark}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0}body{background:#cfc8b4;font:15px/1.45 system-ui,sans-serif;color:var(--t)}
-#app{max-width:430px;height:100%;margin:auto;background:var(--c);display:flex;flex-direction:column;position:relative;overflow:hidden;padding-top:env(safe-area-inset-top,0)}
-#v{flex:1;overflow:auto;padding:16px 16px 28px}#v.foc{background:var(--c)}
-h2,h3{font-family:Fraunces,Georgia,serif;margin:0}h2{font-size:24px;line-height:1.2}h3{font-size:19px}h4{margin:18px 0 8px;font-size:15px}
-p{margin:6px 0}small,.mu{color:var(--m)}
-.hero{background:linear-gradient(150deg,var(--g2),var(--g));color:#fff;border-radius:22px;padding:20px;margin-bottom:14px;border-bottom:3px solid var(--au)}
-.hero p{opacity:.9}.hero small{color:#e9dfb8}
-.card{background:var(--w);border:1px solid var(--ln);border-radius:16px;padding:14px;margin-bottom:12px}
-.row{display:flex;align-items:center;gap:12px}.sp2{justify-content:space-between}
-.b{border:0;border-radius:14px;padding:13px 16px;font:600 15px system-ui;background:var(--g);color:#fff;width:100%;margin-top:8px;cursor:pointer}
-.b.o{background:transparent;color:var(--g);border:1.5px solid var(--g)}.b.au{background:var(--au);color:#2a2108}.b.rd{background:var(--r)}.b[disabled]{opacity:.4}
-.ch{border:1.5px solid var(--ln);background:var(--w);color:var(--t);border-radius:99px;padding:8px 14px;font:500 14px system-ui;margin:0 6px 6px 0;cursor:pointer}.ch.on{background:var(--g);color:#fff;border-color:var(--g)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.g2{grid-template-columns:1fr 1fr}
-.tile{background:var(--w);border:1px solid var(--ln);border-radius:16px;padding:14px 6px;text-align:center;font:600 13px system-ui;color:var(--t);cursor:pointer}.tile i{display:block;font-style:normal;font-size:24px;margin-bottom:4px}
-.bar{height:8px;background:var(--ln);border-radius:9px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--au));border-radius:9px}
-.bd{font:600 12px system-ui;padding:3px 9px;border-radius:99px;background:var(--ln);color:var(--t)}.bd.g{background:#d5efe1;color:#0f5a37}.bd.y{background:#fbefc2;color:#7a5a00}.bd.r{background:#f6d6d2;color:#8e2418}
-.hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bk{border:0;background:var(--w);border-radius:12px;width:38px;height:38px;font-size:22px;color:var(--t);cursor:pointer;border:1px solid var(--ln)}
-.ar{font-family:Amiri,'Scheherazade New',serif;font-size:var(--az);line-height:2.1;text-align:center;direction:rtl}.ar .nm{font-size:.6em;color:var(--au)}
-.mush{background:var(--w);border:2px solid var(--au);border-radius:18px;padding:18px 12px;margin:10px 0;box-shadow:inset 0 0 0 4px var(--c)}
-.seg{display:flex;background:var(--ln);border-radius:14px;padding:4px;margin-bottom:12px}.seg button{flex:1;border:0;background:none;padding:9px 4px;border-radius:11px;font:600 13px system-ui;color:var(--m);cursor:pointer}.seg .on{background:var(--w);color:var(--g)}
-.sp{display:flex;align-items:center;gap:10px;margin:8px 0}.sp span{flex:1}.sp button{width:36px;height:36px;border-radius:11px;border:1px solid var(--ln);background:var(--w);color:var(--t);font-size:18px;cursor:pointer}.sp b{min-width:28px;text-align:center}
-nav{display:flex;background:var(--w);border-top:1px solid var(--ln);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0))}nav button{flex:1;border:0;background:none;padding:6px;font:600 12px system-ui;color:var(--m);cursor:pointer}nav i{display:block;font-style:normal;font-size:21px}nav .on{color:var(--g)}
-.ov{position:absolute;inset:0;background:#0007;display:flex;align-items:flex-end;z-index:9}.sh{background:var(--w);width:100%;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0));max-height:85%;overflow:auto}
-.ts{position:absolute;left:16px;right:16px;bottom:90px;background:#1d2b26;color:#fff;border-radius:12px;padding:12px;text-align:center;z-index:10;font-size:14px}
-.opt{display:block;width:100%;text-align:center;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--ln);background:var(--w);color:var(--t);font:500 15px system-ui;cursor:pointer}.opt.ar{font:var(--az) Amiri,serif;font-size:24px;line-height:1.8}.opt.ok{background:#d5efe1;border-color:var(--ok);color:#0f5a37}.opt.no{background:#f6d6d2;border-color:var(--r);color:#8e2418}
-.fb{background:var(--g2);color:#fff;border-radius:12px;padding:9px 12px;font-size:13px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.fb button{background:#ffffff22;border:0;color:#fff;border-radius:9px;padding:6px 10px;font-weight:600;cursor:pointer}
-.wave{display:flex;gap:3px;height:70px;align-items:center;justify-content:center;margin:14px 0}.wave i{width:5px;height:12px;background:var(--g);border-radius:4px}.wave.on i{animation:w .8s ease-in-out infinite alternate}@keyframes w{to{height:64px}}
-.tg{width:52px;height:30px;border-radius:99px;background:var(--ln);position:relative;border:0;cursor:pointer;flex:none}.tg:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.tg.on{background:var(--g)}.tg.on:after{left:25px}
-.big{font:600 46px Fraunces,serif;text-align:center}.cert{border:3px double var(--au);background:#fffdf3;color:#2b2410;border-radius:6px;padding:22px 16px;text-align:center}.cert h2{color:#0a3d31}
-.blur{filter:blur(9px);user-select:none}.mk{display:flex;gap:6px;margin-top:6px}.mk button{flex:1;border:1.5px solid var(--ln);background:var(--w);border-radius:10px;padding:8px 2px;font:600 12px system-ui;color:var(--t);cursor:pointer}.mk .g{background:#d5efe1;border-color:var(--ok)}.mk .y{background:#fbefc2;border-color:var(--y)}.mk .r{background:#f6d6d2;border-color:var(--r)}
-.emp{text-align:center;padding:18px;color:var(--m)}
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>focusHifz – Prototype + Cek Bacaan Suara</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fraunces:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --g: #0f5c4a;
+        --g2: #0a3d31;
+        --c: #f7f1e3;
+        --w: #fffdf7;
+        --au: #c9a24b;
+        --t: #1d2b26;
+        --m: #667a71;
+        --r: #c0392b;
+        --y: #d9a400;
+        --ok: #1e8e5a;
+        --ln: #e6dcc3;
+        --az: 30px;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --c: #0e1915;
+          --w: #16251f;
+          --t: #efe9d8;
+          --m: #9fb0a8;
+          --ln: #2a3d35;
+          --g: #2f9a7c;
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --c: #0e1915;
+        --w: #16251f;
+        --t: #efe9d8;
+        --m: #9fb0a8;
+        --ln: #2a3d35;
+        --g: #2f9a7c;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        background: #cfc8b4;
+        font:
+          15px/1.45 system-ui,
+          sans-serif;
+        color: var(--t);
+      }
+      #app {
+        max-width: 430px;
+        height: 100%;
+        margin: auto;
+        background: var(--c);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        padding-top: env(safe-area-inset-top, 0);
+      }
+      #v {
+        flex: 1;
+        overflow: auto;
+        padding: 16px 16px 28px;
+      }
+      #v.foc {
+        background: var(--c);
+      }
+      h2,
+      h3 {
+        font-family: Fraunces, Georgia, serif;
+        margin: 0;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      h3 {
+        font-size: 19px;
+      }
+      h4 {
+        margin: 18px 0 8px;
+        font-size: 15px;
+      }
+      p {
+        margin: 6px 0;
+      }
+      small,
+      .mu {
+        color: var(--m);
+      }
+      .hero {
+        background: linear-gradient(150deg, var(--g2), var(--g));
+        color: #fff;
+        border-radius: 22px;
+        padding: 20px;
+        margin-bottom: 14px;
+        border-bottom: 3px solid var(--au);
+      }
+      .hero p {
+        opacity: 0.9;
+      }
+      .hero small {
+        color: #e9dfb8;
+      }
+      .card {
+        background: var(--w);
+        border: 1px solid var(--ln);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .sp2 {
+        justify-content: space-between;
+      }
+      .b {
+        border: 0;
+        border-radius: 14px;
+        padding: 13px 16px;
+        font: 600 15px system-ui;
+        background: var(--g);
+        color: #fff;
+        width: 100%;
+        margin-top: 8px;
+        cursor: pointer;
+      }
+      .b.o {
+        background: transparent;
+        color: var(--g);
+        border: 1.5px solid var(--g);
+      }
+      .b.au {
+        background: var(--au);
+        color: #2a2108;
+      }
+      .b.rd {
+        background: var(--r);
+      }
+      .b[disabled] {
+        opacity: 0.4;
+      }
+      .ch {
+        border: 1.5px solid var(--ln);
+        background: var(--w);
+        color: var(--t);
+        border-radius: 99px;
+        padding: 8px 14px;
+        font: 500 14px system-ui;
+        margin: 0 6px 6px 0;
+        cursor: pointer;
+      }
+      .ch.on {
+        background: var(--g);
+        color: #fff;
+        border-color: var(--g);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .g2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .tile {
+        background: var(--w);
+        border: 1px solid var(--ln);
+        border-radius: 16px;
+        padding: 14px 6px;
+        text-align: center;
+        font: 600 13px system-ui;
+        color: var(--t);
+        cursor: pointer;
+      }
+      .tile i {
+        display: block;
+        font-style: normal;
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+      .bar {
+        height: 8px;
+        background: var(--ln);
+        border-radius: 9px;
+        overflow: hidden;
+        margin: 8px 0;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--g), var(--au));
+        border-radius: 9px;
+      }
+      .bd {
+        font: 600 12px system-ui;
+        padding: 3px 9px;
+        border-radius: 99px;
+        background: var(--ln);
+        color: var(--t);
+      }
+      .bd.g {
+        background: #d5efe1;
+        color: #0f5a37;
+      }
+      .bd.y {
+        background: #fbefc2;
+        color: #7a5a00;
+      }
+      .bd.r {
+        background: #f6d6d2;
+        color: #8e2418;
+      }
+      .hd {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .bk {
+        border: 0;
+        background: var(--w);
+        border-radius: 12px;
+        width: 38px;
+        height: 38px;
+        font-size: 22px;
+        color: var(--t);
+        cursor: pointer;
+        border: 1px solid var(--ln);
+      }
+      .ar {
+        font-family: Amiri, "Scheherazade New", serif;
+        font-size: var(--az);
+        line-height: 2.1;
+        text-align: center;
+        direction: rtl;
+      }
+      .ar .nm {
+        font-size: 0.6em;
+        color: var(--au);
+      }
+      .mush {
+        background: var(--w);
+        border: 2px solid var(--au);
+        border-radius: 18px;
+        padding: 18px 12px;
+        margin: 10px 0;
+        box-shadow: inset 0 0 0 4px var(--c);
+      }
+      .seg {
+        display: flex;
+        background: var(--ln);
+        border-radius: 14px;
+        padding: 4px;
+        margin-bottom: 12px;
+      }
+      .seg button {
+        flex: 1;
+        border: 0;
+        background: none;
+        padding: 9px 4px;
+        border-radius: 11px;
+        font: 600 13px system-ui;
+        color: var(--m);
+        cursor: pointer;
+      }
+      .seg .on {
+        background: var(--w);
+        color: var(--g);
+      }
+      .sp {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 0;
+      }
+      .sp span {
+        flex: 1;
+      }
+      .sp button {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        border: 1px solid var(--ln);
+        background: var(--w);
+        color: var(--t);
+        font-size: 18px;
+        cursor: pointer;
+      }
+      .sp b {
+        min-width: 28px;
+        text-align: center;
+      }
+      nav {
+        display: flex;
+        background: var(--w);
+        border-top: 1px solid var(--ln);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0));
+      }
+      nav button {
+        flex: 1;
+        border: 0;
+        background: none;
+        padding: 6px;
+        font: 600 12px system-ui;
+        color: var(--m);
+        cursor: pointer;
+      }
+      nav i {
+        display: block;
+        font-style: normal;
+        font-size: 21px;
+      }
+      nav .on {
+        color: var(--g);
+      }
+      .ov {
+        position: absolute;
+        inset: 0;
+        background: #0007;
+        display: flex;
+        align-items: flex-end;
+        z-index: 9;
+      }
+      .sh {
+        background: var(--w);
+        width: 100%;
+        border-radius: 22px 22px 0 0;
+        padding: 20px 18px calc(18px + env(safe-area-inset-bottom, 0));
+        max-height: 85%;
+        overflow: auto;
+      }
+      .ts {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 90px;
+        background: #1d2b26;
+        color: #fff;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        z-index: 10;
+        font-size: 14px;
+      }
+      .opt {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 13px;
+        margin-top: 8px;
+        border-radius: 14px;
+        border: 1.5px solid var(--ln);
+        background: var(--w);
+        color: var(--t);
+        font: 500 15px system-ui;
+        cursor: pointer;
+      }
+      .opt.ar {
+        font:
+          var(--az) Amiri,
+          serif;
+        font-size: 24px;
+        line-height: 1.8;
+      }
+      .opt.ok {
+        background: #d5efe1;
+        border-color: var(--ok);
+        color: #0f5a37;
+      }
+      .opt.no {
+        background: #f6d6d2;
+        border-color: var(--r);
+        color: #8e2418;
+      }
+      .fb {
+        background: var(--g2);
+        color: #fff;
+        border-radius: 12px;
+        padding: 9px 12px;
+        font-size: 13px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .fb button {
+        background: #ffffff22;
+        border: 0;
+        color: #fff;
+        border-radius: 9px;
+        padding: 6px 10px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .wave {
+        display: flex;
+        gap: 3px;
+        height: 70px;
+        align-items: center;
+        justify-content: center;
+        margin: 14px 0;
+      }
+      .wave i {
+        width: 5px;
+        height: 12px;
+        background: var(--g);
+        border-radius: 4px;
+      }
+      .wave.on i {
+        animation: w 0.8s ease-in-out infinite alternate;
+      }
+      @keyframes w {
+        to {
+          height: 64px;
+        }
+      }
+      .tg {
+        width: 52px;
+        height: 30px;
+        border-radius: 99px;
+        background: var(--ln);
+        position: relative;
+        border: 0;
+        cursor: pointer;
+        flex: none;
+      }
+      .tg:after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #fff;
+        transition: 0.2s;
+      }
+      .tg.on {
+        background: var(--g);
+      }
+      .tg.on:after {
+        left: 25px;
+      }
+      .big {
+        font:
+          600 46px Fraunces,
+          serif;
+        text-align: center;
+      }
+      .cert {
+        border: 3px double var(--au);
+        background: #fffdf3;
+        color: #2b2410;
+        border-radius: 6px;
+        padding: 22px 16px;
+        text-align: center;
+      }
+      .cert h2 {
+        color: #0a3d31;
+      }
+      .blur {
+        filter: blur(9px);
+        user-select: none;
+      }
+      .mk {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+      }
+      .mk button {
+        flex: 1;
+        border: 1.5px solid var(--ln);
+        background: var(--w);
+        border-radius: 10px;
+        padding: 8px 2px;
+        font: 600 12px system-ui;
+        color: var(--t);
+        cursor: pointer;
+      }
+      .mk .g {
+        background: #d5efe1;
+        border-color: var(--ok);
+      }
+      .mk .y {
+        background: #fbefc2;
+        border-color: var(--y);
+      }
+      .mk .r {
+        background: #f6d6d2;
+        border-color: var(--r);
+      }
+      .emp {
+        text-align: center;
+        padding: 18px;
+        color: var(--m);
+      }
 
-.wd{display:inline-block;padding:0 8px;margin:0 2px;border-radius:9px}
-.wd.ok{background:#d5efe1;color:#0f5a37}.wd.bad{background:#f6d6d2;color:#8e2418}.wd.miss,.wd.near{background:#fbefc2;color:#7a5a00}
-.ta{width:100%;min-height:84px;border:1.5px solid var(--ln);border-radius:12px;padding:10px;background:var(--w);color:var(--t);font:22px/1.8 Amiri,serif;direction:rtl;margin:8px 0}
-.er{font-size:13px;color:var(--m);margin:4px 0}.er b{font-family:Amiri,serif;font-size:18px;color:var(--t)}
-</style></head><body><div id="app"></div>
-<script>
-const SU=[{n:'Al-Fatihah',a:['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ','الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ','صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ']},{n:'Al-Ikhlas',a:['قُلْ هُوَ اللَّهُ أَحَدٌ','اللَّهُ الصَّمَدُ','لَمْ يَلِدْ وَلَمْ يُولَدْ','وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ']}];
-const V=[];SU.forEach((s,i)=>s.a.forEach((t,j)=>V.push({s:i,n:j+1,t})));
-const HK=[{q:'Lam pada "ال" di kata ini dibaca…',t:'الْحَمْدُ',r:'Alif Lam Qamariyah'},{q:'Lam pada "ال" di kata ini dibaca…',t:'الرَّحْمَٰنِ',r:'Alif Lam Syamsiyah'},{q:'Nun sukun bertemu huruf ع. Hukumnya…',t:'أَنْعَمْتَ',r:'Izhar Halqi'},{q:'Huruf د yang sukun di kata ini dibaca…',t:'لَمْ يَلِدْ',r:'Qalqalah'},{q:'Mad pada alif sebelum lam bertasydid di kata ini disebut…',t:'الضَّالِّينَ',r:'Mad Lazim'}];
-const HP=['Alif Lam Qamariyah','Alif Lam Syamsiyah','Izhar Halqi','Qalqalah','Mad Lazim','Ikhfa'];
-const TJ=[['Alif Lam Qamariyah','Lam pada "ال" dibaca jelas bila diikuti huruf qamariyah, mis. ح, ع, ك, م. Contoh: الْحَمْدُ.'],['Alif Lam Syamsiyah','Lam melebur ke huruf sesudahnya bila diikuti huruf syamsiyah, mis. ر, ص, ض, ت. Contoh: الرَّحْمَٰنِ.'],['Izhar Halqi','Nun sukun/tanwin bertemu huruf halq (ء ه ع ح غ خ) dibaca jelas tanpa dengung. Contoh: أَنْعَمْتَ.'],['Qalqalah','Huruf ق ط ب ج د yang sukun dibunyikan memantul. Contoh: يَلِدْ.'],['Mad Lazim','Huruf mad diikuti sukun asli atau tasydid dalam satu kata, dipanjangkan 6 harakat. Contoh: الضَّالِّينَ.'],['Ikhfa','Nun sukun/tanwin bertemu 15 huruf ikhfa dibaca samar disertai dengung.']];
-const L=[{n:'Level 1 · Hafalan surah pilihan',d:'Menghafal satu surah pilihan dengan lancar.',rq:[['Menghafal minimal satu surah pilihan',()=>G.tot>=4],['Lulus ujian sambung ayat (minimal 60%)',()=>C.own.length>0],['Muraja\'ah rutin 7 hari berturut-turut',()=>false]]},{n:'Level 2 · Hafalan beberapa surah',d:'Rincian persyaratan menyusul sesuai kurikulum.',rq:[],lock:1},{n:'Level 3 · Hafalan juz',d:'Rincian persyaratan menyusul sesuai kurikulum.',rq:[],lock:1}];
-let G={name:'Ahmad Fauzi',tot:14,today:2,tgt:5,til:35};
-let M=[{s:0,n:2,st:'ulang',due:'Hari ini',err:3},{s:0,n:6,st:'belajar',due:'Besok',err:1},{s:1,n:3,st:'lancar',due:'3 hari lagi',err:0},{s:1,n:1,st:'belajar',due:'Hari ini',err:2},{s:0,n:4,st:'lancar',due:'Minggu ini',err:0}];
-let F='all',LG=[{t:'Muraja\'ah Al-Fatihah : 2',d:'Kemarin'},{t:'Tilawah 15 menit',d:'2 hari lalu'}],P={notif:1,rem:1,th:'auto'},C={own:[],hist:[]};
-let T={m:'bebas',s:0,f:1,t:7,p:1,min:15,left:900,run:0,el:0,u:'Ayat',n:5,d:0},H={st:'pick',s:0,f:1,t:3,rep:5,cu:0,focus:0,c:0,hide:0,peek:0,rec:0,rt:0,mk:{},ab:0},Q=null;
-let S={tab:'home',scr:'',st:[],m:null,ts:'',tj:-1,sl:0,ec:0};
-const $=s=>document.querySelector(s),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),rnd=a=>a[Math.floor(Math.random()*a.length)],sh=a=>[...a].sort(()=>Math.random()-.5),W=t=>t.split(' ');
-const dt=()=>new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-const mm=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-const ay=(s,f,t)=>SU[s].a.slice(f-1,t).map((x,i)=>x+` <span class=nm>﴿${f+i}﴾</span>`).join(' ');
-const B=(t,a,c='')=>`<button class="b ${c}" onclick="A('${a}')">${t}</button>`;
-const Ch=(t,a,on)=>`<button class="ch${on?' on':''}" onclick="A('${a}')">${t}</button>`;
-const bar=p=>`<div class=bar><i style="width:${Math.round(cl(p,0,1)*100)}%"></i></div>`;
-const bd=(t,c='')=>`<span class="bd ${c}">${t}</span>`;
-const hd=(t,b=1)=>`<div class=hd>${b?'<button class=bk onclick="A(\'back\')">‹</button>':''}<h3>${t}</h3></div>`;
-const SP=(l,v,k)=>`<div class=sp><span>${l}</span><button onclick="A('${k}:-1')">−</button><b>${v}</b><button onclick="A('${k}:1')">+</button></div>`;
-const TG=(on,a)=>`<button class="tg${on?' on':''}" onclick="A('${a}')" aria-label="ubah"></button>`;
-const ring=(p,l,sz=110)=>{const r=sz/2-9,c=2*Math.PI*r;return `<svg width=${sz} height=${sz}><circle cx=${sz/2} cy=${sz/2} r=${r} fill=none stroke="var(--ln)" stroke-width=9 /><circle cx=${sz/2} cy=${sz/2} r=${r} fill=none stroke="var(--au)" stroke-width=9 stroke-linecap=round stroke-dasharray="${c*cl(p,0,1)} ${c}" transform="rotate(-90 ${sz/2} ${sz/2})"/><text x=50% y=50% text-anchor=middle dominant-baseline=central fill="var(--t)" font-size=${sz>120?30:20} font-weight=700>${l}</text></svg>`};
-const sel=(a,k)=>SU.map((s,i)=>Ch(s.n,k+':'+i,a==i)).join('');
-const toast=m=>{S.ts=m;R();setTimeout(()=>{S.ts='';R()},2200)};
-const prev=()=>toast('Preview: belum terhubung ke backend');
-const log=t=>LG.unshift({t,d:'Baru saja'});
-const pend=()=>M.filter(x=>x.st!='lancar').length;
+      .wd {
+        display: inline-block;
+        padding: 0 8px;
+        margin: 0 2px;
+        border-radius: 9px;
+      }
+      .wd.ok {
+        background: #d5efe1;
+        color: #0f5a37;
+      }
+      .wd.bad {
+        background: #f6d6d2;
+        color: #8e2418;
+      }
+      .wd.miss,
+      .wd.near {
+        background: #fbefc2;
+        color: #7a5a00;
+      }
+      .ta {
+        width: 100%;
+        min-height: 84px;
+        border: 1.5px solid var(--ln);
+        border-radius: 12px;
+        padding: 10px;
+        background: var(--w);
+        color: var(--t);
+        font:
+          22px/1.8 Amiri,
+          serif;
+        direction: rtl;
+        margin: 8px 0;
+      }
+      .er {
+        font-size: 13px;
+        color: var(--m);
+        margin: 4px 0;
+      }
+      .er b {
+        font-family: Amiri, serif;
+        font-size: 18px;
+        color: var(--t);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      const SU = [
+        {
+          n: "Al-Fatihah",
+          a: [
+            "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+            "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+            "الرَّحْمَٰنِ الرَّحِيمِ",
+            "مَالِكِ يَوْمِ الدِّينِ",
+            "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+            "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+          ],
+        },
+        {
+          n: "Al-Ikhlas",
+          a: [
+            "قُلْ هُوَ اللَّهُ أَحَدٌ",
+            "اللَّهُ الصَّمَدُ",
+            "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+            "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+          ],
+        },
+      ];
+      const V = [];
+      SU.forEach((s, i) =>
+        s.a.forEach((t, j) => V.push({ s: i, n: j + 1, t })),
+      );
+      const HK = [
+        {
+          q: 'Lam pada "ال" di kata ini dibaca…',
+          t: "الْحَمْدُ",
+          r: "Alif Lam Qamariyah",
+        },
+        {
+          q: 'Lam pada "ال" di kata ini dibaca…',
+          t: "الرَّحْمَٰنِ",
+          r: "Alif Lam Syamsiyah",
+        },
+        {
+          q: "Nun sukun bertemu huruf ع. Hukumnya…",
+          t: "أَنْعَمْتَ",
+          r: "Izhar Halqi",
+        },
+        {
+          q: "Huruf د yang sukun di kata ini dibaca…",
+          t: "لَمْ يَلِدْ",
+          r: "Qalqalah",
+        },
+        {
+          q: "Mad pada alif sebelum lam bertasydid di kata ini disebut…",
+          t: "الضَّالِّينَ",
+          r: "Mad Lazim",
+        },
+      ];
+      const HP = [
+        "Alif Lam Qamariyah",
+        "Alif Lam Syamsiyah",
+        "Izhar Halqi",
+        "Qalqalah",
+        "Mad Lazim",
+        "Ikhfa",
+      ];
+      const TJ = [
+        [
+          "Alif Lam Qamariyah",
+          'Lam pada "ال" dibaca jelas bila diikuti huruf qamariyah, mis. ح, ع, ك, م. Contoh: الْحَمْدُ.',
+        ],
+        [
+          "Alif Lam Syamsiyah",
+          "Lam melebur ke huruf sesudahnya bila diikuti huruf syamsiyah, mis. ر, ص, ض, ت. Contoh: الرَّحْمَٰنِ.",
+        ],
+        [
+          "Izhar Halqi",
+          "Nun sukun/tanwin bertemu huruf halq (ء ه ع ح غ خ) dibaca jelas tanpa dengung. Contoh: أَنْعَمْتَ.",
+        ],
+        [
+          "Qalqalah",
+          "Huruf ق ط ب ج د yang sukun dibunyikan memantul. Contoh: يَلِدْ.",
+        ],
+        [
+          "Mad Lazim",
+          "Huruf mad diikuti sukun asli atau tasydid dalam satu kata, dipanjangkan 6 harakat. Contoh: الضَّالِّينَ.",
+        ],
+        [
+          "Ikhfa",
+          "Nun sukun/tanwin bertemu 15 huruf ikhfa dibaca samar disertai dengung.",
+        ],
+      ];
+      const L = [
+        {
+          n: "Level 1 · Hafalan surah pilihan",
+          d: "Menghafal satu surah pilihan dengan lancar.",
+          rq: [
+            ["Menghafal minimal satu surah pilihan", () => G.tot >= 4],
+            ["Lulus ujian sambung ayat (minimal 60%)", () => C.own.length > 0],
+            ["Muraja'ah rutin 7 hari berturut-turut", () => false],
+          ],
+        },
+        {
+          n: "Level 2 · Hafalan beberapa surah",
+          d: "Rincian persyaratan menyusul sesuai kurikulum.",
+          rq: [],
+          lock: 1,
+        },
+        {
+          n: "Level 3 · Hafalan juz",
+          d: "Rincian persyaratan menyusul sesuai kurikulum.",
+          rq: [],
+          lock: 1,
+        },
+      ];
+      let G = { name: "Ahmad Fauzi", tot: 14, today: 2, tgt: 5, til: 35 };
+      let M = [
+        { s: 0, n: 2, st: "ulang", due: "Hari ini", err: 3 },
+        { s: 0, n: 6, st: "belajar", due: "Besok", err: 1 },
+        { s: 1, n: 3, st: "lancar", due: "3 hari lagi", err: 0 },
+        { s: 1, n: 1, st: "belajar", due: "Hari ini", err: 2 },
+        { s: 0, n: 4, st: "lancar", due: "Minggu ini", err: 0 },
+      ];
+      let F = "all",
+        LG = [
+          { t: "Muraja'ah Al-Fatihah : 2", d: "Kemarin" },
+          { t: "Tilawah 15 menit", d: "2 hari lalu" },
+        ],
+        P = { notif: 1, rem: 1, th: "auto" },
+        C = { own: [], hist: [] };
+      let T = {
+          m: "bebas",
+          s: 0,
+          f: 1,
+          t: 7,
+          p: 1,
+          min: 15,
+          left: 900,
+          run: 0,
+          el: 0,
+          u: "Ayat",
+          n: 5,
+          d: 0,
+        },
+        H = {
+          st: "pick",
+          s: 0,
+          f: 1,
+          t: 3,
+          rep: 5,
+          cu: 0,
+          focus: 0,
+          c: 0,
+          hide: 0,
+          peek: 0,
+          rec: 0,
+          rt: 0,
+          mk: {},
+          ab: 0,
+        },
+        Q = null;
+      let S = {
+        tab: "home",
+        scr: "",
+        st: [],
+        m: null,
+        ts: "",
+        tj: -1,
+        sl: 0,
+        ec: 0,
+      };
+      const $ = (s) => document.querySelector(s),
+        cl = (x, a, b) => Math.max(a, Math.min(b, x)),
+        rnd = (a) => a[Math.floor(Math.random() * a.length)],
+        sh = (a) => [...a].sort(() => Math.random() - 0.5),
+        W = (t) => t.split(" ");
+      const dt = () =>
+        new Date().toLocaleDateString("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      const mm = (s) =>
+        String(Math.floor(s / 60)).padStart(2, "0") +
+        ":" +
+        String(s % 60).padStart(2, "0");
+      const ay = (s, f, t) =>
+        SU[s].a
+          .slice(f - 1, t)
+          .map((x, i) => x + ` <span class=nm>﴿${f + i}﴾</span>`)
+          .join(" ");
+      const B = (t, a, c = "") =>
+        `<button class="b ${c}" onclick="A('${a}')">${t}</button>`;
+      const Ch = (t, a, on) =>
+        `<button class="ch${on ? " on" : ""}" onclick="A('${a}')">${t}</button>`;
+      const bar = (p) =>
+        `<div class=bar><i style="width:${Math.round(cl(p, 0, 1) * 100)}%"></i></div>`;
+      const bd = (t, c = "") => `<span class="bd ${c}">${t}</span>`;
+      const hd = (t, b = 1) =>
+        `<div class=hd>${b ? "<button class=bk onclick=\"A('back')\">‹</button>" : ""}<h3>${t}</h3></div>`;
+      const SP = (l, v, k) =>
+        `<div class=sp><span>${l}</span><button onclick="A('${k}:-1')">−</button><b>${v}</b><button onclick="A('${k}:1')">+</button></div>`;
+      const TG = (on, a) =>
+        `<button class="tg${on ? " on" : ""}" onclick="A('${a}')" aria-label="ubah"></button>`;
+      const ring = (p, l, sz = 110) => {
+        const r = sz / 2 - 9,
+          c = 2 * Math.PI * r;
+        return `<svg width=${sz} height=${sz}><circle cx=${sz / 2} cy=${sz / 2} r=${r} fill=none stroke="var(--ln)" stroke-width=9 /><circle cx=${sz / 2} cy=${sz / 2} r=${r} fill=none stroke="var(--au)" stroke-width=9 stroke-linecap=round stroke-dasharray="${c * cl(p, 0, 1)} ${c}" transform="rotate(-90 ${sz / 2} ${sz / 2})"/><text x=50% y=50% text-anchor=middle dominant-baseline=central fill="var(--t)" font-size=${sz > 120 ? 30 : 20} font-weight=700>${l}</text></svg>`;
+      };
+      const sel = (a, k) =>
+        SU.map((s, i) => Ch(s.n, k + ":" + i, a == i)).join("");
+      const toast = (m) => {
+        S.ts = m;
+        R();
+        setTimeout(() => {
+          S.ts = "";
+          R();
+        }, 2200);
+      };
+      const prev = () => toast("Preview: belum terhubung ke backend");
+      const log = (t) => LG.unshift({ t, d: "Baru saja" });
+      const pend = () => M.filter((x) => x.st != "lancar").length;
 
-function home(){return `<div class=hero><small>${dt()}</small><h2>Assalamu'alaikum, ${G.name}</h2><p>Semoga hari ini ringan. Hafalan terjaga oleh pengulangan kecil yang rutin, bukan oleh satu hari yang berat.</p></div>
-<div class="card row">${ring(G.today/G.tgt,G.today+'/'+G.tgt)}<div style="flex:1"><b>Target hari ini</b><p class=mu>${G.today} dari ${G.tgt} ayat</p><p>Total dihafal: <b>${G.tot} ayat</b></p><p>Sedang dipelajari: <b>${SU[H.s].n}</b></p></div></div>
-<div class=grid style="grid-template-columns:1fr 1fr"><div class=card><small>Progres tilawah</small><b> ${G.til}%</b>${bar(G.til/100)}</div><div class=card><small>Perlu muraja'ah</small><h3>${pend()} ayat</h3></div></div>
-<h4>Lanjutkan</h4>${B('Lanjutkan hafalan','go:hafal')}${B('Lanjutkan tilawah','go:tilawah','o')}${B('Lanjutkan muraja\'ah','go:muraja','o')}
-<h4>Akses cepat</h4><div class=grid>${[['📖','Tilawah','go:tilawah'],['🧠','Hafalan','go:hafal'],['🔁','Muraja\'ah','go:muraja'],['🏆','LCC','tab:lcc'],['✨','Tajwid','go:tajwid'],['🎓','Sertifikasi','go:sert']].map(x=>`<button class=tile onclick="A('${x[2]}')"><i>${x[0]}</i>${x[1]}</button>`).join('')}</div>
-<div class=card style="margin-top:14px"><b>Pengingat</b><p class=mu>Kutipan ayat dan hadis akan tampil dengan sumber yang jelas setelah konten diverifikasi. Untuk sementara: sisihkan 10 menit hari ini untuk satu muraja'ah.</p></div>`}
-function learn(){return `<h2 style="margin-bottom:12px">Belajar</h2><h4 style="margin-top:0">Tilawah</h4>
-${[['Tilawah bebas','Pilih surah dan ayat, baca dalam tampilan mushaf','bebas'],['Tilawah dengan waktu','Timer 10, 15, 30, atau 60 menit','waktu'],['Tilawah berdasarkan target','Target ayat, halaman, atau surah','target']].map(x=>`<div class="card row" onclick="A('tl:${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`).join('')}
+      function home() {
+        return `<div class=hero><small>${dt()}</small><h2>Assalamu'alaikum, ${G.name}</h2><p>Semoga hari ini ringan. Hafalan terjaga oleh pengulangan kecil yang rutin, bukan oleh satu hari yang berat.</p></div>
+<div class="card row">${ring(G.today / G.tgt, G.today + "/" + G.tgt)}<div style="flex:1"><b>Target hari ini</b><p class=mu>${G.today} dari ${G.tgt} ayat</p><p>Total dihafal: <b>${G.tot} ayat</b></p><p>Sedang dipelajari: <b>${SU[H.s].n}</b></p></div></div>
+<div class=grid style="grid-template-columns:1fr 1fr"><div class=card><small>Progres tilawah</small><b> ${G.til}%</b>${bar(G.til / 100)}</div><div class=card><small>Perlu muraja'ah</small><h3>${pend()} ayat</h3></div></div>
+<h4>Lanjutkan</h4>${B("Lanjutkan hafalan", "go:hafal")}${B("Lanjutkan tilawah", "go:tilawah", "o")}${B("Lanjutkan muraja'ah", "go:muraja", "o")}
+<h4>Akses cepat</h4><div class=grid>${[
+          ["📖", "Tilawah", "go:tilawah"],
+          ["🧠", "Hafalan", "go:hafal"],
+          ["🔁", "Muraja'ah", "go:muraja"],
+          ["🏆", "LCC", "tab:lcc"],
+          ["✨", "Tajwid", "go:tajwid"],
+          ["🎓", "Sertifikasi", "go:sert"],
+        ]
+          .map(
+            (x) =>
+              `<button class=tile onclick="A('${x[2]}')"><i>${x[0]}</i>${x[1]}</button>`,
+          )
+          .join("")}</div>
+<div class=card style="margin-top:14px"><b>Pengingat</b><p class=mu>Kutipan ayat dan hadis akan tampil dengan sumber yang jelas setelah konten diverifikasi. Untuk sementara: sisihkan 10 menit hari ini untuk satu muraja'ah.</p></div>`;
+      }
+      function learn() {
+        return `<h2 style="margin-bottom:12px">Belajar</h2><h4 style="margin-top:0">Tilawah</h4>
+${[
+  [
+    "Tilawah bebas",
+    "Pilih surah dan ayat, baca dalam tampilan mushaf",
+    "bebas",
+  ],
+  ["Tilawah dengan waktu", "Timer 10, 15, 30, atau 60 menit", "waktu"],
+  ["Tilawah berdasarkan target", "Target ayat, halaman, atau surah", "target"],
+]
+  .map(
+    (x) =>
+      `<div class="card row" onclick="A('tl:${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`,
+  )
+  .join("")}
 <h4>Hafalan</h4><div class="card row" onclick="A('go:hafal')" style="cursor:pointer;border-color:var(--au)"><div style="flex:1"><b>Mulai hafalan</b><p class=mu>Pilih ayat, ulangi, uji, rekam, lalu muraja'ah. Focus Mode tersedia sebelum sesi.</p></div>›</div>
 <div class="card row" onclick="A('go:muraja')" style="cursor:pointer"><div style="flex:1"><b>Muraja'ah</b><p class=mu>${pend()} ayat perlu diulang</p></div>›</div>
-<h4>Tajwid</h4><div class="card row" onclick="A('go:tajwid')" style="cursor:pointer"><div style="flex:1"><b>Belajar tajwid</b><p class=mu>Ringkasan hukum bacaan dan latihan</p></div>›</div>`}
-function lcc(){return `<h2 style="margin-bottom:4px">LCC Al-Qur'an</h2><p class=mu>Latihan cerdas cermat. Soal memakai surah contoh (Al-Fatihah dan Al-Ikhlas).</p>
-${[['🔗','Sambung Ayat','Pilih kelanjutan atau kata yang hilang','sambung'],['🔍','Tebak Ayat','Tebak surah dan nomor ayat','tebak'],['🧩','Susun Ayat','Urutkan potongan ayat acak','susun'],['📚','Tebak Hukum Bacaan','Nun sukun, mim sukun, mad, dan lainnya','hukum'],['⏱️','Tantangan Waktu','60 detik, skor, dan streak','tantang']].map(x=>`<div class="card row" onclick="A('q:${x[3]}')" style="cursor:pointer"><span style="font-size:28px">${x[0]}</span><div style="flex:1"><b>${x[1]}</b><p class=mu>${x[2]}</p></div>›</div>`).join('')}`}
-function prof(){const sc=C.own.length;return `<div class=card style="text-align:center"><div style="width:72px;height:72px;border-radius:50%;background:var(--g);color:#fff;font:700 28px Fraunces;display:grid;place-items:center;margin:0 auto 8px">${G.name.split(' ').map(w=>w[0]).join('')}</div><h3>${G.name}</h3><p class=mu>ahmad@contoh.id · akun contoh</p></div>
+<h4>Tajwid</h4><div class="card row" onclick="A('go:tajwid')" style="cursor:pointer"><div style="flex:1"><b>Belajar tajwid</b><p class=mu>Ringkasan hukum bacaan dan latihan</p></div>›</div>`;
+      }
+      function lcc() {
+        return `<h2 style="margin-bottom:4px">LCC Al-Qur'an</h2><p class=mu>Latihan cerdas cermat. Soal memakai surah contoh (Al-Fatihah dan Al-Ikhlas).</p>
+${[
+  ["🔗", "Sambung Ayat", "Pilih kelanjutan atau kata yang hilang", "sambung"],
+  ["🔍", "Tebak Ayat", "Tebak surah dan nomor ayat", "tebak"],
+  ["🧩", "Susun Ayat", "Urutkan potongan ayat acak", "susun"],
+  [
+    "📚",
+    "Tebak Hukum Bacaan",
+    "Nun sukun, mim sukun, mad, dan lainnya",
+    "hukum",
+  ],
+  ["⏱️", "Tantangan Waktu", "60 detik, skor, dan streak", "tantang"],
+]
+  .map(
+    (x) =>
+      `<div class="card row" onclick="A('q:${x[3]}')" style="cursor:pointer"><span style="font-size:28px">${x[0]}</span><div style="flex:1"><b>${x[1]}</b><p class=mu>${x[2]}</p></div>›</div>`,
+  )
+  .join("")}`;
+      }
+      function prof() {
+        const sc = C.own.length;
+        return `<div class=card style="text-align:center"><div style="width:72px;height:72px;border-radius:50%;background:var(--g);color:#fff;font:700 28px Fraunces;display:grid;place-items:center;margin:0 auto 8px">${G.name
+          .split(" ")
+          .map((w) => w[0])
+          .join(
+            "",
+          )}</div><h3>${G.name}</h3><p class=mu>ahmad@contoh.id · akun contoh</p></div>
 <div class=grid><div class=card style="text-align:center"><h3>${G.tot}</h3><small>ayat hafal</small></div><div class=card style="text-align:center"><h3>6</h3><small>hari beruntun</small></div><div class=card style="text-align:center"><h3>${sc}</h3><small>sertifikat</small></div></div>
-<h4>Riwayat aktivitas</h4><div class=card>${LG.slice(0,5).map(x=>`<div class="row sp2" style="padding:5px 0"><span>${x.t}</span><small>${x.d}</small></div>`).join('')}</div>
-<div class="card row" onclick="A('go:sert')" style="cursor:pointer"><div style="flex:1"><b>Sertifikat saya</b><p class=mu>${sc?sc+' sertifikat':'Belum ada sertifikat'}</p></div>›</div>
-<h4>Pengaturan</h4><div class=card><div class="row sp2"><span>Notifikasi</span>${TG(P.notif,'pf:notif')}</div><div class="row sp2" style="margin-top:12px"><span>Pengingat muraja'ah</span>${TG(P.rem,'pf:rem')}</div></div>
-<div class=card><b>Tampilan</b>${SP('Ukuran huruf Arab',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--az')),'az')}<div style="margin-top:6px">${Ch('Otomatis','th:auto',P.th=='auto')}${Ch('Terang','th:light',P.th=='light')}${Ch('Gelap','th:dark',P.th=='dark')}</div></div><p class=mu style="text-align:center">Prototype HifzFlow · data contoh</p>`}
+<h4>Riwayat aktivitas</h4><div class=card>${LG.slice(0, 5)
+          .map(
+            (x) =>
+              `<div class="row sp2" style="padding:5px 0"><span>${x.t}</span><small>${x.d}</small></div>`,
+          )
+          .join("")}</div>
+<div class="card row" onclick="A('go:sert')" style="cursor:pointer"><div style="flex:1"><b>Sertifikat saya</b><p class=mu>${sc ? sc + " sertifikat" : "Belum ada sertifikat"}</p></div>›</div>
+<h4>Pengaturan</h4><div class=card><div class="row sp2"><span>Notifikasi</span>${TG(P.notif, "pf:notif")}</div><div class="row sp2" style="margin-top:12px"><span>Pengingat muraja'ah</span>${TG(P.rem, "pf:rem")}</div></div>
+<div class=card><b>Tampilan</b>${SP("Ukuran huruf Arab", parseInt(getComputedStyle(document.documentElement).getPropertyValue("--az")), "az")}<div style="margin-top:6px">${Ch("Otomatis", "th:auto", P.th == "auto")}${Ch("Terang", "th:light", P.th == "light")}${Ch("Gelap", "th:dark", P.th == "dark")}</div></div><p class=mu style="text-align:center">Prototype focusHifz · data contoh</p>`;
+      }
 
-function tilawah(){const n=SU[T.s].a.length;let b='';
-if(T.m=='bebas')b=`<div class=card><b>Surah</b><div style="margin-top:8px">${sel(T.s,'ts')}</div>${SP('Ayat awal',T.f,'tz:f')}${SP('Ayat akhir',T.t,'tz:t')}</div><div class=mush><div class=ar>${ay(T.s,T.p,T.p)}</div></div><div class="row sp2"><button class=ch onclick="A('tp:-1')">‹ Sebelumnya</button><small>Ayat ${T.p} · ${T.f}–${T.t}</small><button class=ch onclick="A('tp:1')">Berikutnya ›</button></div>${bar((T.p-T.f+1)/(T.t-T.f+1))}<small>Progres bacaan ${Math.round((T.p-T.f+1)/(T.t-T.f+1)*100)}%</small>`;
-else if(T.m=='waktu')b=`<div style="text-align:center">${[10,15,30,60].map(x=>Ch(x+' menit','tmin:'+x,T.min==x)).join('')}</div><div style="text-align:center;margin:10px 0">${ring(T.left/(T.min*60),mm(T.left),190)}</div><p class=mu style="text-align:center">${T.run?'Sedang berjalan':T.el?'Dijeda':'Siap dimulai'} · terbaca ${mm(T.el)}</p>${B(T.run?'Jeda':T.el?'Lanjutkan':'Mulai','trun')}${B('Akhiri sesi','tend','o')}`;
-else b=`<div class=card><b>Jenis target</b><div style="margin-top:8px">${['Ayat','Halaman','Surah'].map(x=>Ch(x,'tu:'+x,T.u==x)).join('')}</div>${SP('Jumlah '+T.u.toLowerCase(),T.n,'tn')}</div><div class=card><div class="row sp2"><b>Progres target</b><span>${T.d}/${T.n} ${T.u.toLowerCase()}</span></div>${bar(T.d/T.n)}</div>${B('Tandai 1 '+T.u.toLowerCase()+' selesai','tdone')}${B('Atur ulang','trs','o')}`;
-return hd('Tilawah')+`<div class=seg>${[['bebas','Bebas'],['waktu','Waktu'],['target','Target']].map(x=>`<button class="${T.m==x[0]?'on':''}" onclick="A('tm:${x[0]}')">${x[1]}</button>`).join('')}</div>`+b}
-function muraja(){const l=M.map((x,i)=>({...x,i})).filter(x=>F=='all'||x.st==F),nm={ulang:['Perlu diulang','r'],belajar:['Sedang dipelajari','y'],lancar:['Sudah lancar','g']};
-return hd('Muraja\'ah')+`<div>${[['all','Semua'],['ulang','Perlu diulang'],['belajar','Sedang dipelajari'],['lancar','Sudah lancar']].map(x=>Ch(x[1],'mf:'+x[0],F==x[0])).join('')}</div>`+(l.length?l.map(x=>`<div class=card onclick="A('mo:${x.i}')" style="cursor:pointer"><div class="row sp2"><b>${SU[x.s].n} : ${x.n}</b>${bd(nm[x.st][0],nm[x.st][1])}</div><div class=ar style="font-size:22px;line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${SU[x.s].a[x.n-1]}</div><small>Jadwal: ${x.due} · salah ${x.err}x</small></div>`).join(''):'<div class=emp>Tidak ada ayat di kategori ini.</div>')}
-function hafal(){const n=SU[H.s].a.length,sess=['rep','test','rec','eval'].includes(H.st),fb=H.focus&&sess?`<div class=fb><span>🔒 Focus Mode aktif · simulasi</span><button onclick="A('ask:e')">Keluar darurat</button></div>`:'';
-const top=sess?`<div class=hd><button class=bk onclick="A('ask:n')">✕</button><h3>${SU[H.s].n} : ${H.f}–${H.t}</h3></div>`:hd('Hafalan');let b='';
-const stp=['Pilih','Ulangi','Uji','Rekam','Evaluasi'],ix={pick:0,set:0,rep:1,test:2,rec:3,eval:4}[H.st];
-const dots=H.st=='done'?'':`<div class=row style="gap:4px;margin-bottom:10px">${stp.map((x,i)=>`<div style="flex:1"><div style="height:5px;border-radius:5px;background:${i<=ix?'var(--g)':'var(--ln)'}"></div><small style="font-size:11px">${x}</small></div>`).join('')}</div>`;
-if(H.st=='pick')b=`<div class=card><b>Pilih surah</b><div style="margin-top:8px">${sel(H.s,'hs')}</div></div><div class=card>${SP('Ayat awal',H.f,'hz:f')}${SP('Ayat akhir',H.t,'hz:t')}<p class=mu>${SU[H.s].n} · ${n} ayat · hafalan ayat ${H.f}–${H.t} (${H.t-H.f+1} ayat)</p></div>${B('Lanjut: atur pengulangan','hset')}`;
-if(H.st=='set')b=`<div class=card><b>Jumlah pengulangan</b><div style="margin-top:8px">${Ch('5x','hrep:5',!H.cu&&H.rep==5)}${Ch('10x','hrep:10',!H.cu&&H.rep==10)}${Ch('Khusus','hcu',H.cu)}</div>${H.cu?SP('Ulangi',H.rep+'x','hrn'):''}</div>
-<div class=card><div class="row sp2"><div><b>Focus Mode</b><p class=mu>Bantu menjaga konsentrasi selama sesi ini saja.</p></div>${TG(H.focus,'hfoc')}</div>${H.focus?`<p style="font-size:13px;background:var(--ln);padding:10px;border-radius:10px">Di prototype ini Focus Mode hanya <b>simulasi tampilan</b>. Pada Android nanti, pembatasan notifikasi (Jangan Ganggu) memerlukan izin Anda dan status sebelumnya akan dipulihkan. Aplikasi tidak dapat memblokir semua aplikasi lain.</p>`:''}</div>${B('Mulai sesi','hstart')}`;
-if(H.st=='rep')b=`<div class=mush><div class=ar>${ay(H.s,H.f,H.t)}</div></div><div class=card style="text-align:center"><div class=big>${H.c}<small style="font-size:20px"> / ${H.rep}</small></div><small>pengulangan</small>${bar(H.c/H.rep)}</div>${B('Saya sudah membaca','hread')}${B('Lanjut uji hafalan','htest',H.c>=H.rep?'au':'o').replace('<button','<button '+(H.c>=H.rep?'':'disabled'))}`;
-if(H.st=='test')b=`<div class=mush><div class="ar ${H.hide?'blur':''}">${ay(H.s,H.f,H.t)}</div></div>${H.hide?`<p class=mu style="text-align:center">Teks disembunyikan. Lafalkan dari ingatan.</p>`:''}${B(H.hide?'Tampilkan ayat':'Sembunyikan ayat','hhide','o')}${B('Mulai rekam','hrec')}`;
-if(H.st=='rec'){const live=((H.tx||'')+' '+(H.sess||'')).trim();
-b=`<div class=card style="text-align:center"><b>${['Siap merekam','Mendengarkan…','Dijeda','Memproses…'][H.rec]}</b><div class="wave ${H.rec==1?'on':''}">${Array.from({length:26},(_,i)=>`<i style="animation-delay:${i*.06}s"></i>`).join('')}</div><div class=big style="font-size:34px">${mm(H.rt)}</div><small>${SRC?'Bacaan diubah menjadi teks lewat layanan pengenalan suara browser (perlu internet dan izin mikrofon).':'Browser ini belum mendukung pengenalan suara. Pakai Chrome atau Edge, atau uji lewat teks manual di bawah.'}</small></div>
-${H.err?`<div class=card style="background:#f6d6d2;color:#8e2418;border-color:var(--r)"><b>${esc(H.err)}</b></div>`:''}
-<div class=card><small>Teks yang terdengar</small><div class=ar style="font-size:22px;line-height:1.9;min-height:44px">${live?esc(live):'<small style="font-size:13px;direction:ltr">Belum ada suara terdeteksi…</small>'}</div></div>
-${H.rec!=1?B(H.rec==2?'Lanjutkan':'Mulai','rc:1'):B('Jeda','rc:2','o')}${B('Selesai & cek bacaan','rc:3','au').replace('<button','<button '+((H.rt||live)&&H.rec!=3?'':'disabled'))}
-${H.rec==0||H.rec==2?`<div class=card style="margin-top:12px"><b>Uji tanpa mikrofon</b><p class=mu style="font-size:13px">Ketik atau tempel bacaan Arab untuk mencoba pengecekan.</p><textarea class=ta oninput="H.man=this.value" placeholder="اكتب أو الصق القراءة هنا">${esc(H.man||'')}</textarea>${B('Cek teks ini','rcm','o')}</div>`:''}`}
-if(H.st=='eval'){const r=H.res;
-if(!r||!r.heard||!r.total){b=`<div class=card style="background:#fbefc2;color:#4a3800;border-color:var(--y)"><b>Tidak ada bacaan yang terdeteksi</b><p style="font-size:13px">Coba rekam ulang dengan suara lebih jelas, atau nilai sendiri hasil hafalan Anda di bawah ini.</p></div>`;
- for(let n=H.f;n<=H.t;n++){const k=H.mk[n];b+=`<div class=card><div class=ar style="font-size:22px;line-height:1.8">${SU[H.s].a[n-1]}</div><small>Ayat ${n}</small><div class=mk><button class="${k=='g'?'g':''}" onclick="A('hm:${n}:g')">Lancar</button><button class="${k=='y'?'y':''}" onclick="A('hm:${n}:y')">Ragu</button><button class="${k=='r'?'r':''}" onclick="A('hm:${n}:r')">Salah</button></div></div>`}}
-else{const c=r.cnt;
- b=`<div class="card row">${ring(r.acc,Math.round(r.acc*100)+'%',96)}<div style="flex:1"><b>Hasil pengecekan</b><p class=mu style="margin:2px 0 8px">Kecocokan dari ${r.total} kata</p><div style="display:flex;gap:6px;flex-wrap:wrap">${bd(c.ok+' benar','g')}${bd(c.bad+' salah','r')}${bd((c.near+c.miss)+' ragu / terlewat','y')}</div></div></div>
+      function tilawah() {
+        const n = SU[T.s].a.length;
+        let b = "";
+        if (T.m == "bebas")
+          b = `<div class=card><b>Surah</b><div style="margin-top:8px">${sel(T.s, "ts")}</div>${SP("Ayat awal", T.f, "tz:f")}${SP("Ayat akhir", T.t, "tz:t")}</div><div class=mush><div class=ar>${ay(T.s, T.p, T.p)}</div></div><div class="row sp2"><button class=ch onclick="A('tp:-1')">‹ Sebelumnya</button><small>Ayat ${T.p} · ${T.f}–${T.t}</small><button class=ch onclick="A('tp:1')">Berikutnya ›</button></div>${bar((T.p - T.f + 1) / (T.t - T.f + 1))}<small>Progres bacaan ${Math.round(((T.p - T.f + 1) / (T.t - T.f + 1)) * 100)}%</small>`;
+        else if (T.m == "waktu")
+          b = `<div style="text-align:center">${[10, 15, 30, 60].map((x) => Ch(x + " menit", "tmin:" + x, T.min == x)).join("")}</div><div style="text-align:center;margin:10px 0">${ring(T.left / (T.min * 60), mm(T.left), 190)}</div><p class=mu style="text-align:center">${T.run ? "Sedang berjalan" : T.el ? "Dijeda" : "Siap dimulai"} · terbaca ${mm(T.el)}</p>${B(T.run ? "Jeda" : T.el ? "Lanjutkan" : "Mulai", "trun")}${B("Akhiri sesi", "tend", "o")}`;
+        else
+          b = `<div class=card><b>Jenis target</b><div style="margin-top:8px">${["Ayat", "Halaman", "Surah"].map((x) => Ch(x, "tu:" + x, T.u == x)).join("")}</div>${SP("Jumlah " + T.u.toLowerCase(), T.n, "tn")}</div><div class=card><div class="row sp2"><b>Progres target</b><span>${T.d}/${T.n} ${T.u.toLowerCase()}</span></div>${bar(T.d / T.n)}</div>${B("Tandai 1 " + T.u.toLowerCase() + " selesai", "tdone")}${B("Atur ulang", "trs", "o")}`;
+        return (
+          hd("Tilawah") +
+          `<div class=seg>${[
+            ["bebas", "Bebas"],
+            ["waktu", "Waktu"],
+            ["target", "Target"],
+          ]
+            .map(
+              (x) =>
+                `<button class="${T.m == x[0] ? "on" : ""}" onclick="A('tm:${x[0]}')">${x[1]}</button>`,
+            )
+            .join("")}</div>` +
+          b
+        );
+      }
+      function muraja() {
+        const l = M.map((x, i) => ({ ...x, i })).filter(
+            (x) => F == "all" || x.st == F,
+          ),
+          nm = {
+            ulang: ["Perlu diulang", "r"],
+            belajar: ["Sedang dipelajari", "y"],
+            lancar: ["Sudah lancar", "g"],
+          };
+        return (
+          hd("Muraja'ah") +
+          `<div>${[
+            ["all", "Semua"],
+            ["ulang", "Perlu diulang"],
+            ["belajar", "Sedang dipelajari"],
+            ["lancar", "Sudah lancar"],
+          ]
+            .map((x) => Ch(x[1], "mf:" + x[0], F == x[0]))
+            .join("")}</div>` +
+          (l.length
+            ? l
+                .map(
+                  (x) =>
+                    `<div class=card onclick="A('mo:${x.i}')" style="cursor:pointer"><div class="row sp2"><b>${SU[x.s].n} : ${x.n}</b>${bd(nm[x.st][0], nm[x.st][1])}</div><div class=ar style="font-size:22px;line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${SU[x.s].a[x.n - 1]}</div><small>Jadwal: ${x.due} · salah ${x.err}x</small></div>`,
+                )
+                .join("")
+            : "<div class=emp>Tidak ada ayat di kategori ini.</div>")
+        );
+      }
+      function hafal() {
+        const n = SU[H.s].a.length,
+          sess = ["rep", "test", "rec", "eval"].includes(H.st),
+          fb =
+            H.focus && sess
+              ? `<div class=fb><span>🔒 Focus Mode aktif · simulasi</span><button onclick="A('ask:e')">Keluar darurat</button></div>`
+              : "";
+        const top = sess
+          ? `<div class=hd><button class=bk onclick="A('ask:n')">✕</button><h3>${SU[H.s].n} : ${H.f}–${H.t}</h3></div>`
+          : hd("Hafalan");
+        let b = "";
+        const stp = ["Pilih", "Ulangi", "Uji", "Rekam", "Evaluasi"],
+          ix = { pick: 0, set: 0, rep: 1, test: 2, rec: 3, eval: 4 }[H.st];
+        const dots =
+          H.st == "done"
+            ? ""
+            : `<div class=row style="gap:4px;margin-bottom:10px">${stp.map((x, i) => `<div style="flex:1"><div style="height:5px;border-radius:5px;background:${i <= ix ? "var(--g)" : "var(--ln)"}"></div><small style="font-size:11px">${x}</small></div>`).join("")}</div>`;
+        if (H.st == "pick")
+          b = `<div class=card><b>Pilih surah</b><div style="margin-top:8px">${sel(H.s, "hs")}</div></div><div class=card>${SP("Ayat awal", H.f, "hz:f")}${SP("Ayat akhir", H.t, "hz:t")}<p class=mu>${SU[H.s].n} · ${n} ayat · hafalan ayat ${H.f}–${H.t} (${H.t - H.f + 1} ayat)</p></div>${B("Lanjut: atur pengulangan", "hset")}`;
+        if (H.st == "set")
+          b = `<div class=card><b>Jumlah pengulangan</b><div style="margin-top:8px">${Ch("5x", "hrep:5", !H.cu && H.rep == 5)}${Ch("10x", "hrep:10", !H.cu && H.rep == 10)}${Ch("Khusus", "hcu", H.cu)}</div>${H.cu ? SP("Ulangi", H.rep + "x", "hrn") : ""}</div>
+<div class=card><div class="row sp2"><div><b>Focus Mode</b><p class=mu>Bantu menjaga konsentrasi selama sesi ini saja.</p></div>${TG(H.focus, "hfoc")}</div>${H.focus ? `<p style="font-size:13px;background:var(--ln);padding:10px;border-radius:10px">Di prototype ini Focus Mode hanya <b>simulasi tampilan</b>. Pada Android nanti, pembatasan notifikasi (Jangan Ganggu) memerlukan izin Anda dan status sebelumnya akan dipulihkan. Aplikasi tidak dapat memblokir semua aplikasi lain.</p>` : ""}</div>${B("Mulai sesi", "hstart")}`;
+        if (H.st == "rep")
+          b = `<div class=mush><div class=ar>${ay(H.s, H.f, H.t)}</div></div><div class=card style="text-align:center"><div class=big>${H.c}<small style="font-size:20px"> / ${H.rep}</small></div><small>pengulangan</small>${bar(H.c / H.rep)}</div>${B("Saya sudah membaca", "hread")}${B("Lanjut uji hafalan", "htest", H.c >= H.rep ? "au" : "o").replace("<button", "<button " + (H.c >= H.rep ? "" : "disabled"))}`;
+        if (H.st == "test")
+          b = `<div class=mush><div class="ar ${H.hide ? "blur" : ""}">${ay(H.s, H.f, H.t)}</div></div>${H.hide ? `<p class=mu style="text-align:center">Teks disembunyikan. Lafalkan dari ingatan.</p>` : ""}${B(H.hide ? "Tampilkan ayat" : "Sembunyikan ayat", "hhide", "o")}${B("Mulai rekam", "hrec")}`;
+        if (H.st == "rec") {
+          const live = ((H.tx || "") + " " + (H.sess || "")).trim();
+          b = `<div class=card style="text-align:center"><b>${["Siap merekam", "Mendengarkan…", "Dijeda", "Memproses…"][H.rec]}</b><div class="wave ${H.rec == 1 ? "on" : ""}">${Array.from({ length: 26 }, (_, i) => `<i style="animation-delay:${i * 0.06}s"></i>`).join("")}</div><div class=big style="font-size:34px">${mm(H.rt)}</div><small>${SRC ? "Bacaan diubah menjadi teks lewat layanan pengenalan suara browser (perlu internet dan izin mikrofon)." : "Browser ini belum mendukung pengenalan suara. Pakai Chrome atau Edge, atau uji lewat teks manual di bawah."}</small></div>
+${H.err ? `<div class=card style="background:#f6d6d2;color:#8e2418;border-color:var(--r)"><b>${esc(H.err)}</b></div>` : ""}
+<div class=card><small>Teks yang terdengar</small><div class=ar style="font-size:22px;line-height:1.9;min-height:44px">${live ? esc(live) : '<small style="font-size:13px;direction:ltr">Belum ada suara terdeteksi…</small>'}</div></div>
+${H.rec != 1 ? B(H.rec == 2 ? "Lanjutkan" : "Mulai", "rc:1") : B("Jeda", "rc:2", "o")}${B("Selesai & cek bacaan", "rc:3", "au").replace("<button", "<button " + ((H.rt || live) && H.rec != 3 ? "" : "disabled"))}
+${H.rec == 0 || H.rec == 2 ? `<div class=card style="margin-top:12px"><b>Uji tanpa mikrofon</b><p class=mu style="font-size:13px">Ketik atau tempel bacaan Arab untuk mencoba pengecekan.</p><textarea class=ta oninput="H.man=this.value" placeholder="اكتب أو الصق القراءة هنا">${esc(H.man || "")}</textarea>${B("Cek teks ini", "rcm", "o")}</div>` : ""}`;
+        }
+        if (H.st == "eval") {
+          const r = H.res;
+          if (!r || !r.heard || !r.total) {
+            b = `<div class=card style="background:#fbefc2;color:#4a3800;border-color:var(--y)"><b>Tidak ada bacaan yang terdeteksi</b><p style="font-size:13px">Coba rekam ulang dengan suara lebih jelas, atau nilai sendiri hasil hafalan Anda di bawah ini.</p></div>`;
+            for (let n = H.f; n <= H.t; n++) {
+              const k = H.mk[n];
+              b += `<div class=card><div class=ar style="font-size:22px;line-height:1.8">${SU[H.s].a[n - 1]}</div><small>Ayat ${n}</small><div class=mk><button class="${k == "g" ? "g" : ""}" onclick="A('hm:${n}:g')">Lancar</button><button class="${k == "y" ? "y" : ""}" onclick="A('hm:${n}:y')">Ragu</button><button class="${k == "r" ? "r" : ""}" onclick="A('hm:${n}:r')">Salah</button></div></div>`;
+            }
+          } else {
+            const c = r.cnt;
+            b = `<div class="card row">${ring(r.acc, Math.round(r.acc * 100) + "%", 96)}<div style="flex:1"><b>Hasil pengecekan</b><p class=mu style="margin:2px 0 8px">Kecocokan dari ${r.total} kata</p><div style="display:flex;gap:6px;flex-wrap:wrap">${bd(c.ok + " benar", "g")}${bd(c.bad + " salah", "r")}${bd(c.near + c.miss + " ragu / terlewat", "y")}</div></div></div>
 <div class=card><small>Yang terdengar</small><div class=ar style="font-size:20px;line-height:1.9">${esc(r.heard)}</div></div>
-<div class=row style="gap:6px;margin:8px 0;flex-wrap:wrap">${bd('Hijau: benar','g')}${bd('Merah: salah','r')}${bd('Kuning: mirip / terlewat','y')}</div>`;
- for(let n=H.f;n<=H.t;n++){const a=r.ays[n],k=H.mk[n],er=a.ws.filter(w=>w.st=='bad'),ms=a.ws.filter(w=>w.st=='miss'),nr=a.ws.filter(w=>w.st=='near');
-  b+=`<div class=card><div class=ar style="font-size:24px;line-height:2.1">${a.ws.map(w=>`<span class="wd ${w.st}">${w.orig}</span>`).join(' ')}</div><div class="row sp2"><small>Ayat ${n}</small>${bd(a.v=='g'?'Lancar':a.v=='y'?'Ragu':'Salah',a.v)}</div>
-${er.map(w=>`<p class=er>Terdengar <b>${esc(w.heard)}</b> → seharusnya <b>${w.orig}</b></p>`).join('')}${nr.map(w=>`<p class=er>Kurang jelas: <b>${w.orig}</b> (terdengar <b>${esc(w.heard)}</b>)</p>`).join('')}${ms.map(w=>`<p class=er>Terlewat: <b>${w.orig}</b></p>`).join('')}
-<div class=mk><button class="${k=='g'?'g':''}" onclick="A('hm:${n}:g')">Lancar</button><button class="${k=='y'?'y':''}" onclick="A('hm:${n}:y')">Ragu</button><button class="${k=='r'?'r':''}" onclick="A('hm:${n}:r')">Salah</button></div></div>`}
- b+=`<p class=mu style="font-size:12px">Pengecekan otomatis mencocokkan kata hasil pengenalan suara dengan teks ayat. Ini belum menilai tajwid, makhraj, atau panjang pendek bacaan. Verifikasi dengan guru. Anda tetap bisa mengubah penilaian tiap ayat.</p>`}
-b+=B('Simpan & lanjut muraja\'ah','hfin')+B('Rekam ulang','hrec','o')}
-if(H.st=='done'){const cnt=H.t-H.f+1;b=`<div class=card style="text-align:center;margin-top:20px"><div style="font-size:50px">${H.ab?'🌙':'✅'}</div><h3>${H.ab?'Sesi diakhiri':'Sesi selesai'}</h3><p class=mu>${H.ab?'Progres sesi ini tidak disimpan.':`${cnt} ayat ${SU[H.s].n} sudah diproses. Progres hari ini ${G.today}/${G.tgt}.`}</p>${H.focus?`<p style="background:var(--ln);padding:10px;border-radius:10px;font-size:13px">Focus Mode dimatikan dan pengaturan fokus dipulihkan (simulasi).</p>`:''}</div>${H.ab?'':B('Buka muraja\'ah','hmur')}${B('Kembali ke beranda','tab:home','o')}`}
-return `${fb}${top}${dots}${b}`}
-function tajwid(){return hd('Belajar tajwid')+`<p class=mu>Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.</p>`+TJ.map((x,i)=>`<div class=card onclick="A('tj:${i}')" style="cursor:pointer"><div class="row sp2"><b>${x[0]}</b><span>${S.tj==i?'−':'+'}</span></div>${S.tj==i?`<p>${x[1]}</p>`:''}</div>`).join('')+B('Latihan tebak hukum bacaan','q:hukum')}
+<div class=row style="gap:6px;margin:8px 0;flex-wrap:wrap">${bd("Hijau: benar", "g")}${bd("Merah: salah", "r")}${bd("Kuning: mirip / terlewat", "y")}</div>`;
+            for (let n = H.f; n <= H.t; n++) {
+              const a = r.ays[n],
+                k = H.mk[n],
+                er = a.ws.filter((w) => w.st == "bad"),
+                ms = a.ws.filter((w) => w.st == "miss"),
+                nr = a.ws.filter((w) => w.st == "near");
+              b += `<div class=card><div class=ar style="font-size:24px;line-height:2.1">${a.ws.map((w) => `<span class="wd ${w.st}">${w.orig}</span>`).join(" ")}</div><div class="row sp2"><small>Ayat ${n}</small>${bd(a.v == "g" ? "Lancar" : a.v == "y" ? "Ragu" : "Salah", a.v)}</div>
+${er.map((w) => `<p class=er>Terdengar <b>${esc(w.heard)}</b> → seharusnya <b>${w.orig}</b></p>`).join("")}${nr.map((w) => `<p class=er>Kurang jelas: <b>${w.orig}</b> (terdengar <b>${esc(w.heard)}</b>)</p>`).join("")}${ms.map((w) => `<p class=er>Terlewat: <b>${w.orig}</b></p>`).join("")}
+<div class=mk><button class="${k == "g" ? "g" : ""}" onclick="A('hm:${n}:g')">Lancar</button><button class="${k == "y" ? "y" : ""}" onclick="A('hm:${n}:y')">Ragu</button><button class="${k == "r" ? "r" : ""}" onclick="A('hm:${n}:r')">Salah</button></div></div>`;
+            }
+            b += `<p class=mu style="font-size:12px">Pengecekan otomatis mencocokkan kata hasil pengenalan suara dengan teks ayat. Ini belum menilai tajwid, makhraj, atau panjang pendek bacaan. Verifikasi dengan guru. Anda tetap bisa mengubah penilaian tiap ayat.</p>`;
+          }
+          b +=
+            B("Simpan & lanjut muraja'ah", "hfin") +
+            B("Rekam ulang", "hrec", "o");
+        }
+        if (H.st == "done") {
+          const cnt = H.t - H.f + 1;
+          b = `<div class=card style="text-align:center;margin-top:20px"><div style="font-size:50px">${H.ab ? "🌙" : "✅"}</div><h3>${H.ab ? "Sesi diakhiri" : "Sesi selesai"}</h3><p class=mu>${H.ab ? "Progres sesi ini tidak disimpan." : `${cnt} ayat ${SU[H.s].n} sudah diproses. Progres hari ini ${G.today}/${G.tgt}.`}</p>${H.focus ? `<p style="background:var(--ln);padding:10px;border-radius:10px;font-size:13px">Focus Mode dimatikan dan pengaturan fokus dipulihkan (simulasi).</p>` : ""}</div>${H.ab ? "" : B("Buka muraja'ah", "hmur")}${B("Kembali ke beranda", "tab:home", "o")}`;
+        }
+        return `${fb}${top}${dots}${b}`;
+      }
+      function tajwid() {
+        return (
+          hd("Belajar tajwid") +
+          `<p class=mu>Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.</p>` +
+          TJ.map(
+            (x, i) =>
+              `<div class=card onclick="A('tj:${i}')" style="cursor:pointer"><div class="row sp2"><b>${x[0]}</b><span>${S.tj == i ? "−" : "+"}</span></div>${S.tj == i ? `<p>${x[1]}</p>` : ""}</div>`,
+          ).join("") +
+          B("Latihan tebak hukum bacaan", "q:hukum")
+        );
+      }
 
-function gen(k){
-if(k=='sambung'){const v=rnd(V.filter(x=>W(x.t).length>=3)),w=W(v.t),o=V.filter(x=>x!==v&&W(x.t).length>=3);
-if(Math.random()<.5&&w.length>=4){const j=1+Math.floor(Math.random()*(w.length-2)),ws=[...new Set(o.flatMap(x=>W(x.t)).filter(z=>z!=w[j]))],op=sh([w[j],...sh(ws).slice(0,3)]);return{ty:'o',q:'Lengkapi kata yang hilang',ar:w.map((z,i)=>i==j?'_____':z).join(' '),o:op,a:op.indexOf(w[j]),top:SU[v.s].n}}
-const c=Math.ceil(w.length/2),rest=w.slice(c).join(' '),ds=[...new Set(o.map(x=>{const y=W(x.t);return y.slice(Math.ceil(y.length/2)).join(' ')}).filter(r=>r!=rest))],op=sh([rest,...sh(ds).slice(0,3)]);return{ty:'o',q:'Pilih kelanjutan ayat',ar:w.slice(0,c).join(' ')+' …',o:op,a:op.indexOf(rest),top:SU[v.s].n}}
-if(k=='tebak'){const v=rnd(V),lb=x=>SU[x.s].n+' : '+x.n,op=sh([v,...sh(V.filter(x=>x!==v)).slice(0,3)]).map(lb);return{ty:'o',q:'Ayat ini berasal dari…',ar:v.t,o:op,a:op.indexOf(lb(v)),top:SU[v.s].n}}
-if(k=='susun'){const v=rnd(V.filter(x=>W(x.t).length>=3&&W(x.t).length<=6));return{ty:'s',q:'Susun potongan menjadi ayat yang benar',ws:sh(W(v.t)),ans:v.t,top:SU[v.s].n}}
-const h=rnd(HK),op=sh([h.r,...sh(HP.filter(x=>x!=h.r)).slice(0,3)]);return{ty:'o',q:h.q,ar:h.t,o:op,a:op.indexOf(h.r),top:h.r}}
-function startQ(k){const n={tantang:12,susun:4}[k]||5;let l=[];if(k=='hukum')l=sh(HK).map(h=>{const op=sh([h.r,...sh(HP.filter(x=>x!=h.r)).slice(0,3)]);return{ty:'o',q:h.q,ar:h.t,o:op,a:op.indexOf(h.r),top:h.r}});else for(let i=0;i<n;i++)l.push(gen(k=='tantang'?rnd(['sambung','tebak','susun','hukum']):k=='ujian'?'sambung':k));
-Q={k,l,i:0,ok:0,no:0,st:0,best:0,t0:Date.now(),sel:null,seq:[],left:60,done:0,bad:[]}}
-const QN={sambung:'Sambung Ayat',tebak:'Tebak Ayat',susun:'Susun Ayat',hukum:'Tebak Hukum Bacaan',tantang:'Tantangan Waktu',ujian:'Ujian Sambung Ayat'};
-function quiz(){const q=Q.l[Q.i],tm=Q.k=='tantang',a=Q.sel!=null;let b='';
-if(q.ty=='o')b=q.o.map((x,i)=>`<button class="opt ${a&&i==q.a?'ok':a&&i==Q.sel?'no':''}" onclick="A('pick:${i}')">${x}</button>`).join('');
-else{const ch=Q.seq.map(i=>q.ws[i]);b=`<div class=mush style="min-height:70px"><div class=ar style="font-size:26px">${ch.length?Q.seq.map(i=>`<button class=ch style="font:inherit" onclick="A('un:${i}')" ${a?'disabled':''}>${q.ws[i]}</button>`).join(''):'<small>Ketuk potongan di bawah</small>'}</div></div><div class=ar style="font-size:26px">${q.ws.map((w,i)=>Q.seq.includes(i)?'':`<button class=ch style="font:inherit" onclick="A('ad:${i}')">${w}</button>`).join('')}</div>${a?`<div class="card" style="background:${Q.sel?'#d5efe1':'#f6d6d2'};color:#222;margin-top:8px"><b>${Q.sel?'Benar':'Kurang tepat'}</b><div class=ar style="font-size:24px">${q.ans}</div></div>`:B('Periksa','chk').replace('<button','<button '+(Q.seq.length==q.ws.length?'':'disabled'))}`}
-return `${hd(QN[Q.k])}<div class="row sp2"><small>Soal ${Q.i+1}/${Q.l.length}</small>${tm?`<span>${bd('⏱ '+Q.left+'d','y')} ${bd('Streak '+Q.st,'g')} ${bd('Benar '+Q.ok)}`:''}</span></div>${bar((Q.i+1)/Q.l.length)}<p><b>${q.q}</b></p>${q.ar?`<div class=mush><div class=ar>${q.ar}</div></div>`:''}${b}${a?B(Q.i+1>=Q.l.length?'Lihat hasil':'Lanjut','nx'):''}`}
-function fin(){Q.done=1;Q.dur=Math.round((Date.now()-Q.t0)/1000);const ex=Q.k=='ujian',pc=Q.ok/Q.l.length;
-if(ex){C.hist.unshift({t:'Ujian Sambung Ayat · Level 1',r:Math.round(pc*100)+'% · '+(pc>=.6?'Lulus':'Belum lulus'),d:dt()});if(pc>=.6&&!C.own.length)C.own.push({lv:0,d:dt(),no:'HF-'+new Date().getFullYear()+'-'+String(1000+Math.floor(Math.random()*9000))})}
-log(QN[Q.k]+': '+Q.ok+'/'+Q.l.length+' benar');S.scr='res'}
-function res(){const n=Q.l.length,pc=Math.round(Q.ok/n*100),ex=Q.k=='ujian',pass=ex&&pc>=60,tt=[...new Set(Q.bad.map(x=>x.top))];
-return `<div class=card style="text-align:center;margin-top:10px"><small>${QN[Q.k]}</small><div class=big>${Q.k=='tantang'?Q.ok*10+Q.best*2+' poin':pc+'%'}</div><p>${Q.ok} benar · ${Q.no} salah${Q.k=='tantang'?` · ${n-Q.ok-Q.no} tidak sempat`:''} · ${mm(Q.dur)}${Q.k=='tantang'?` · streak terbaik ${Q.best}`:''}</p>${ex?bd(pass?'Lulus':'Belum lulus',pass?'g':'r'):''}</div>
-<h4>Materi yang perlu dipelajari</h4>${tt.length?`<div class=card>${tt.map(x=>bd(x,'y')).join(' ')}</div>`:'<div class=card><p class=mu>Tidak ada. Bagus!</p></div>'}
-${Q.bad.length?`<h4>Pelajari kesalahan</h4>`+Q.bad.map(x=>`<div class=card><div class=ar style="font-size:22px;line-height:1.8">${x.ar||x.ans}</div><small>${x.q}</small><p>Jawaban benar: <b class=ar style="font-size:20px">${x.ty=='o'?x.o[x.a]:x.ans}</b></p></div>`).join(''):''}
-${pass?B('Lihat sertifikat','cert','au'):''}${B('Coba lagi','retry')}${B(ex?'Kembali ke Sertifikasi':'Kembali ke LCC','after','o')}${Q.bad.some(x=>HP.includes(x.top))?B('Pelajari tajwid','go:tajwid','o'):''}`}
-function qr(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;let r='';for(let y=0;y<21;y++)for(let x=0;x<21;x++){let on;if((x<7||x>13)&&(y<7||y>13)&&!(x>13&&y>13)){const a=x<7?x:x-14,b=y<7?y:y-14;on=a==0||a==6||b==0||b==6||(a>1&&a<5&&b>1&&b<5)}else{h=(h*1103515245+12345)>>>0;on=(h>>16)&1}if(on)r+=`<rect x=${x} y=${y} width=1 height=1 />`}return `<svg viewBox="0 0 21 21" width=96 height=96 fill="#0a3d31">${r}</svg>`}
-function cert(){const c=C.own[S.ec]||C.own[0];return hd('Sertifikat')+`<div class=cert><small>HifzFlow · Sertifikat kompetensi internal</small><h2 style="margin:10px 0">Sertifikat Kompetensi</h2><p>diberikan kepada</p><h3 style="font-size:24px">${G.name}</h3><p>atas capaian <b>${L[c.lv].n}</b></p><p>Tanggal terbit: ${c.d}</p><p>Nomor: ${c.no} <small>(contoh)</small></p><div style="display:flex;justify-content:center;margin:10px 0">${qr(c.no)}</div><small>QR contoh, belum terhubung ke layanan verifikasi</small></div><p class=mu style="font-size:13px">Sertifikat ini adalah sertifikasi kompetensi internal HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an.</p>${B('Bagikan (preview)','prev','o')}`}
-function sert(){const l=L[S.sl],dn=l.rq.filter(x=>x[1]()).length;
-return hd('Sertifikasi')+`<div class=card style="border-color:var(--au)"><b>Sertifikasi kompetensi internal</b><p class=mu>Program penilaian kemampuan hafalan di HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum.</p></div>
-<h4>Jenjang</h4>${L.map((x,i)=>`<div class=card onclick="A('sl:${i}')" style="cursor:pointer;${S.sl==i?'border-color:var(--g)':''}"><div class="row sp2"><b>${x.n}</b>${x.lock?bd('Segera'):bd(C.own.some(c=>c.lv==i)?'Diraih':'Terbuka',C.own.some(c=>c.lv==i)?'g':'y')}</div><p class=mu>${x.d}</p></div>`).join('')}
-${l.lock?'':`<h4>Persyaratan & progres</h4><div class=card>${bar(dn/l.rq.length)}${l.rq.map(x=>`<p>${x[1]()?'✅':'⬜'} ${x[0]}</p>`).join('')}</div>${B('Ikut ujian','go:sertex')}`}
-<h4>Riwayat ujian</h4>${C.hist.length?C.hist.map(x=>`<div class=card><b>${x.t}</b><p class=mu>${x.r} · ${x.d}</p></div>`).join(''):'<div class="card emp">Belum ada ujian. Mulai dari Level 1.</div>'}
-<h4>Sertifikat saya</h4>${C.own.length?C.own.map((x,i)=>`<div class="card row" onclick="A('cert:${i}')" style="cursor:pointer"><span style="font-size:26px">🎓</span><div style="flex:1"><b>${L[x.lv].n}</b><p class=mu>${x.no} · ${x.d}</p></div>›</div>`).join(''):'<div class="card emp">Belum ada sertifikat.</div>'}`}
-function sertex(){return hd('Ujian Level 1')+`<p class=mu>Pilih jenis ujian. Lulus ujian sambung ayat (≥60%) menerbitkan sertifikat contoh.</p>${[['Ujian sambung ayat','5 soal sambung ayat. Sudah berfungsi.','q:ujian'],['Ujian hafalan','Setor hafalan ke penguji. Preview.','pv'],['Ujian kelancaran','Penilaian kelancaran bacaan. Preview.','pv'],['Penilaian penguji manusia','Penguji menilai rekaman Anda. Preview.','pv']].map(x=>`<div class="card row" onclick="A('${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`).join('')}`}
+      function gen(k) {
+        if (k == "sambung") {
+          const v = rnd(V.filter((x) => W(x.t).length >= 3)),
+            w = W(v.t),
+            o = V.filter((x) => x !== v && W(x.t).length >= 3);
+          if (Math.random() < 0.5 && w.length >= 4) {
+            const j = 1 + Math.floor(Math.random() * (w.length - 2)),
+              ws = [
+                ...new Set(o.flatMap((x) => W(x.t)).filter((z) => z != w[j])),
+              ],
+              op = sh([w[j], ...sh(ws).slice(0, 3)]);
+            return {
+              ty: "o",
+              q: "Lengkapi kata yang hilang",
+              ar: w.map((z, i) => (i == j ? "_____" : z)).join(" "),
+              o: op,
+              a: op.indexOf(w[j]),
+              top: SU[v.s].n,
+            };
+          }
+          const c = Math.ceil(w.length / 2),
+            rest = w.slice(c).join(" "),
+            ds = [
+              ...new Set(
+                o
+                  .map((x) => {
+                    const y = W(x.t);
+                    return y.slice(Math.ceil(y.length / 2)).join(" ");
+                  })
+                  .filter((r) => r != rest),
+              ),
+            ],
+            op = sh([rest, ...sh(ds).slice(0, 3)]);
+          return {
+            ty: "o",
+            q: "Pilih kelanjutan ayat",
+            ar: w.slice(0, c).join(" ") + " …",
+            o: op,
+            a: op.indexOf(rest),
+            top: SU[v.s].n,
+          };
+        }
+        if (k == "tebak") {
+          const v = rnd(V),
+            lb = (x) => SU[x.s].n + " : " + x.n,
+            op = sh([v, ...sh(V.filter((x) => x !== v)).slice(0, 3)]).map(lb);
+          return {
+            ty: "o",
+            q: "Ayat ini berasal dari…",
+            ar: v.t,
+            o: op,
+            a: op.indexOf(lb(v)),
+            top: SU[v.s].n,
+          };
+        }
+        if (k == "susun") {
+          const v = rnd(
+            V.filter((x) => W(x.t).length >= 3 && W(x.t).length <= 6),
+          );
+          return {
+            ty: "s",
+            q: "Susun potongan menjadi ayat yang benar",
+            ws: sh(W(v.t)),
+            ans: v.t,
+            top: SU[v.s].n,
+          };
+        }
+        const h = rnd(HK),
+          op = sh([h.r, ...sh(HP.filter((x) => x != h.r)).slice(0, 3)]);
+        return {
+          ty: "o",
+          q: h.q,
+          ar: h.t,
+          o: op,
+          a: op.indexOf(h.r),
+          top: h.r,
+        };
+      }
+      function startQ(k) {
+        const n = { tantang: 12, susun: 4 }[k] || 5;
+        let l = [];
+        if (k == "hukum")
+          l = sh(HK).map((h) => {
+            const op = sh([h.r, ...sh(HP.filter((x) => x != h.r)).slice(0, 3)]);
+            return {
+              ty: "o",
+              q: h.q,
+              ar: h.t,
+              o: op,
+              a: op.indexOf(h.r),
+              top: h.r,
+            };
+          });
+        else
+          for (let i = 0; i < n; i++)
+            l.push(
+              gen(
+                k == "tantang"
+                  ? rnd(["sambung", "tebak", "susun", "hukum"])
+                  : k == "ujian"
+                    ? "sambung"
+                    : k,
+              ),
+            );
+        Q = {
+          k,
+          l,
+          i: 0,
+          ok: 0,
+          no: 0,
+          st: 0,
+          best: 0,
+          t0: Date.now(),
+          sel: null,
+          seq: [],
+          left: 60,
+          done: 0,
+          bad: [],
+        };
+      }
+      const QN = {
+        sambung: "Sambung Ayat",
+        tebak: "Tebak Ayat",
+        susun: "Susun Ayat",
+        hukum: "Tebak Hukum Bacaan",
+        tantang: "Tantangan Waktu",
+        ujian: "Ujian Sambung Ayat",
+      };
+      function quiz() {
+        const q = Q.l[Q.i],
+          tm = Q.k == "tantang",
+          a = Q.sel != null;
+        let b = "";
+        if (q.ty == "o")
+          b = q.o
+            .map(
+              (x, i) =>
+                `<button class="opt ${a && i == q.a ? "ok" : a && i == Q.sel ? "no" : ""}" onclick="A('pick:${i}')">${x}</button>`,
+            )
+            .join("");
+        else {
+          const ch = Q.seq.map((i) => q.ws[i]);
+          b = `<div class=mush style="min-height:70px"><div class=ar style="font-size:26px">${ch.length ? Q.seq.map((i) => `<button class=ch style="font:inherit" onclick="A('un:${i}')" ${a ? "disabled" : ""}>${q.ws[i]}</button>`).join("") : "<small>Ketuk potongan di bawah</small>"}</div></div><div class=ar style="font-size:26px">${q.ws.map((w, i) => (Q.seq.includes(i) ? "" : `<button class=ch style="font:inherit" onclick="A('ad:${i}')">${w}</button>`)).join("")}</div>${a ? `<div class="card" style="background:${Q.sel ? "#d5efe1" : "#f6d6d2"};color:#222;margin-top:8px"><b>${Q.sel ? "Benar" : "Kurang tepat"}</b><div class=ar style="font-size:24px">${q.ans}</div></div>` : B("Periksa", "chk").replace("<button", "<button " + (Q.seq.length == q.ws.length ? "" : "disabled"))}`;
+        }
+        return `${hd(QN[Q.k])}<div class="row sp2"><small>Soal ${Q.i + 1}/${Q.l.length}</small>${tm ? `<span>${bd("⏱ " + Q.left + "d", "y")} ${bd("Streak " + Q.st, "g")} ${bd("Benar " + Q.ok)}` : ""}</span></div>${bar((Q.i + 1) / Q.l.length)}<p><b>${q.q}</b></p>${q.ar ? `<div class=mush><div class=ar>${q.ar}</div></div>` : ""}${b}${a ? B(Q.i + 1 >= Q.l.length ? "Lihat hasil" : "Lanjut", "nx") : ""}`;
+      }
+      function fin() {
+        Q.done = 1;
+        Q.dur = Math.round((Date.now() - Q.t0) / 1000);
+        const ex = Q.k == "ujian",
+          pc = Q.ok / Q.l.length;
+        if (ex) {
+          C.hist.unshift({
+            t: "Ujian Sambung Ayat · Level 1",
+            r:
+              Math.round(pc * 100) +
+              "% · " +
+              (pc >= 0.6 ? "Lulus" : "Belum lulus"),
+            d: dt(),
+          });
+          if (pc >= 0.6 && !C.own.length)
+            C.own.push({
+              lv: 0,
+              d: dt(),
+              no:
+                "HF-" +
+                new Date().getFullYear() +
+                "-" +
+                String(1000 + Math.floor(Math.random() * 9000)),
+            });
+        }
+        log(QN[Q.k] + ": " + Q.ok + "/" + Q.l.length + " benar");
+        S.scr = "res";
+      }
+      function res() {
+        const n = Q.l.length,
+          pc = Math.round((Q.ok / n) * 100),
+          ex = Q.k == "ujian",
+          pass = ex && pc >= 60,
+          tt = [...new Set(Q.bad.map((x) => x.top))];
+        return `<div class=card style="text-align:center;margin-top:10px"><small>${QN[Q.k]}</small><div class=big>${Q.k == "tantang" ? Q.ok * 10 + Q.best * 2 + " poin" : pc + "%"}</div><p>${Q.ok} benar · ${Q.no} salah${Q.k == "tantang" ? ` · ${n - Q.ok - Q.no} tidak sempat` : ""} · ${mm(Q.dur)}${Q.k == "tantang" ? ` · streak terbaik ${Q.best}` : ""}</p>${ex ? bd(pass ? "Lulus" : "Belum lulus", pass ? "g" : "r") : ""}</div>
+<h4>Materi yang perlu dipelajari</h4>${tt.length ? `<div class=card>${tt.map((x) => bd(x, "y")).join(" ")}</div>` : "<div class=card><p class=mu>Tidak ada. Bagus!</p></div>"}
+${Q.bad.length ? `<h4>Pelajari kesalahan</h4>` + Q.bad.map((x) => `<div class=card><div class=ar style="font-size:22px;line-height:1.8">${x.ar || x.ans}</div><small>${x.q}</small><p>Jawaban benar: <b class=ar style="font-size:20px">${x.ty == "o" ? x.o[x.a] : x.ans}</b></p></div>`).join("") : ""}
+${pass ? B("Lihat sertifikat", "cert", "au") : ""}${B("Coba lagi", "retry")}${B(ex ? "Kembali ke Sertifikasi" : "Kembali ke LCC", "after", "o")}${Q.bad.some((x) => HP.includes(x.top)) ? B("Pelajari tajwid", "go:tajwid", "o") : ""}`;
+      }
+      function qr(s) {
+        let h = 0;
+        for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+        let r = "";
+        for (let y = 0; y < 21; y++)
+          for (let x = 0; x < 21; x++) {
+            let on;
+            if ((x < 7 || x > 13) && (y < 7 || y > 13) && !(x > 13 && y > 13)) {
+              const a = x < 7 ? x : x - 14,
+                b = y < 7 ? y : y - 14;
+              on =
+                a == 0 ||
+                a == 6 ||
+                b == 0 ||
+                b == 6 ||
+                (a > 1 && a < 5 && b > 1 && b < 5);
+            } else {
+              h = (h * 1103515245 + 12345) >>> 0;
+              on = (h >> 16) & 1;
+            }
+            if (on) r += `<rect x=${x} y=${y} width=1 height=1 />`;
+          }
+        return `<svg viewBox="0 0 21 21" width=96 height=96 fill="#0a3d31">${r}</svg>`;
+      }
+      function cert() {
+        const c = C.own[S.ec] || C.own[0];
+        return (
+          hd("Sertifikat") +
+          `<div class=cert><small>focusHifz · Sertifikat kompetensi internal</small><h2 style="margin:10px 0">Sertifikat Kompetensi</h2><p>diberikan kepada</p><h3 style="font-size:24px">${G.name}</h3><p>atas capaian <b>${L[c.lv].n}</b></p><p>Tanggal terbit: ${c.d}</p><p>Nomor: ${c.no} <small>(contoh)</small></p><div style="display:flex;justify-content:center;margin:10px 0">${qr(c.no)}</div><small>QR contoh, belum terhubung ke layanan verifikasi</small></div><p class=mu style="font-size:13px">Sertifikat ini adalah sertifikasi kompetensi internal foucsHifz. Bukan ijazah dan bukan sanad Al-Qur'an.</p>${B("Bagikan (preview)", "prev", "o")}`
+        );
+      }
+      function sert() {
+        const l = L[S.sl],
+          dn = l.rq.filter((x) => x[1]()).length;
+        return (
+          hd("Sertifikasi") +
+          `<div class=card style="border-color:var(--au)"><b>Sertifikasi kompetensi internal</b><p class=mu>Program penilaian kemampuan hafalan di focusHifz. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum.</p></div>
+<h4>Jenjang</h4>${L.map((x, i) => `<div class=card onclick="A('sl:${i}')" style="cursor:pointer;${S.sl == i ? "border-color:var(--g)" : ""}"><div class="row sp2"><b>${x.n}</b>${x.lock ? bd("Segera") : bd(C.own.some((c) => c.lv == i) ? "Diraih" : "Terbuka", C.own.some((c) => c.lv == i) ? "g" : "y")}</div><p class=mu>${x.d}</p></div>`).join("")}
+${l.lock ? "" : `<h4>Persyaratan & progres</h4><div class=card>${bar(dn / l.rq.length)}${l.rq.map((x) => `<p>${x[1]() ? "✅" : "⬜"} ${x[0]}</p>`).join("")}</div>${B("Ikut ujian", "go:sertex")}`}
+<h4>Riwayat ujian</h4>${C.hist.length ? C.hist.map((x) => `<div class=card><b>${x.t}</b><p class=mu>${x.r} · ${x.d}</p></div>`).join("") : '<div class="card emp">Belum ada ujian. Mulai dari Level 1.</div>'}
+<h4>Sertifikat saya</h4>${C.own.length ? C.own.map((x, i) => `<div class="card row" onclick="A('cert:${i}')" style="cursor:pointer"><span style="font-size:26px">🎓</span><div style="flex:1"><b>${L[x.lv].n}</b><p class=mu>${x.no} · ${x.d}</p></div>›</div>`).join("") : '<div class="card emp">Belum ada sertifikat.</div>'}`
+        );
+      }
+      function sertex() {
+        return (
+          hd("Ujian Level 1") +
+          `<p class=mu>Pilih jenis ujian. Lulus ujian sambung ayat (≥60%) menerbitkan sertifikat contoh.</p>${[
+            [
+              "Ujian sambung ayat",
+              "5 soal sambung ayat. Sudah berfungsi.",
+              "q:ujian",
+            ],
+            ["Ujian hafalan", "Setor hafalan ke penguji. Preview.", "pv"],
+            ["Ujian kelancaran", "Penilaian kelancaran bacaan. Preview.", "pv"],
+            [
+              "Penilaian penguji manusia",
+              "Penguji menilai rekaman Anda. Preview.",
+              "pv",
+            ],
+          ]
+            .map(
+              (x) =>
+                `<div class="card row" onclick="A('${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`,
+            )
+            .join("")}`
+        );
+      }
 
+      //<CHECKER
+      const AN = (s) =>
+        String(s)
+          .replace(/[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+          .replace(/[أإآٱ]/g, "ا")
+          .replace(/ى/g, "ي")
+          .replace(/ئ/g, "ي")
+          .replace(/ؤ/g, "و")
+          .replace(/ة/g, "ه")
+          .replace(/[^\u0621-\u064A\s]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      const lev = (a, b) => {
+        const m = a.length,
+          n = b.length;
+        let p = Array.from({ length: n + 1 }, (_, j) => j);
+        for (let i = 1; i <= m; i++) {
+          const c = [i];
+          for (let j = 1; j <= n; j++)
+            c[j] = Math.min(
+              p[j] + 1,
+              c[j - 1] + 1,
+              p[j - 1] + (a[i - 1] == b[j - 1] ? 0 : 1),
+            );
+          p = c;
+        }
+        return p[n];
+      };
+      const sim = (a, b) =>
+        !a.length && !b.length
+          ? 1
+          : 1 - lev(a, b) / Math.max(a.length, b.length);
+      function checkRecitation(s, f, t, heardRaw) {
+        const T = [];
+        for (let n = f; n <= t; n++)
+          SU[s].a[n - 1].split(" ").forEach((w) => {
+            const k = AN(w);
+            if (k) T.push({ orig: w, k, ay: n, st: "miss", heard: "" });
+          });
+        const raw = AN(heardRaw || ""),
+          Hh = raw ? raw.split(" ") : [],
+          n = T.length,
+          m = Hh.length;
+        const D = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0)),
+          P = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+        const sc = (x, y) => {
+          const q = sim(T[x].k, Hh[y]);
+          return q >= 0.5 ? 1 - q : 1.2;
+        };
+        for (let i = 1; i <= n; i++) {
+          D[i][0] = i;
+          P[i][0] = 1;
+        }
+        for (let j = 1; j <= m; j++) {
+          D[0][j] = j;
+          P[0][j] = 2;
+        }
+        for (let i = 1; i <= n; i++)
+          for (let j = 1; j <= m; j++) {
+            const a = D[i - 1][j - 1] + sc(i - 1, j - 1),
+              b = D[i - 1][j] + 1,
+              c = D[i][j - 1] + 1,
+              mn = Math.min(a, b, c);
+            D[i][j] = mn;
+            P[i][j] = mn == a ? 0 : mn == b ? 1 : 2;
+          }
+        let i = n,
+          j = m,
+          extra = 0;
+        while (i > 0 || j > 0) {
+          const p = i > 0 && j > 0 ? P[i][j] : i > 0 ? 1 : 2;
+          if (p == 0) {
+            const q = sim(T[i - 1].k, Hh[j - 1]);
+            T[i - 1].heard = Hh[j - 1];
+            T[i - 1].st = q >= 0.85 ? "ok" : q >= 0.6 ? "near" : "bad";
+            i--;
+            j--;
+          } else if (p == 1) {
+            T[i - 1].st = "miss";
+            i--;
+          } else {
+            extra++;
+            j--;
+          }
+        }
+        const cnt = { ok: 0, near: 0, bad: 0, miss: 0 };
+        T.forEach((w) => cnt[w.st]++);
+        const ays = {};
+        for (let a = f; a <= t; a++) {
+          const ws = T.filter((w) => w.ay == a),
+            bad = ws.some((w) => w.st == "bad"),
+            soft = ws.some((w) => w.st == "near" || w.st == "miss");
+          ays[a] = { ws, v: bad ? "r" : soft ? "y" : "g" };
+        }
+        return {
+          heard: String(heardRaw || "").trim(),
+          total: n,
+          acc: n ? (cnt.ok + 0.5 * cnt.near) / n : 0,
+          cnt,
+          extra,
+          ays,
+        };
+      }
+      //CHECKER>
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
 
-//<CHECKER
-const AN=s=>String(s).replace(/[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ئ/g,'ي').replace(/ؤ/g,'و').replace(/ة/g,'ه').replace(/[^\u0621-\u064A\s]/g,' ').replace(/\s+/g,' ').trim();
-const lev=(a,b)=>{const m=a.length,n=b.length;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]};
-const sim=(a,b)=>(!a.length&&!b.length)?1:1-lev(a,b)/Math.max(a.length,b.length);
-function checkRecitation(s,f,t,heardRaw){
- const T=[];for(let n=f;n<=t;n++)SU[s].a[n-1].split(' ').forEach(w=>{const k=AN(w);if(k)T.push({orig:w,k,ay:n,st:'miss',heard:''})});
- const raw=AN(heardRaw||''),Hh=raw?raw.split(' '):[],n=T.length,m=Hh.length;
- const D=Array.from({length:n+1},()=>new Array(m+1).fill(0)),P=Array.from({length:n+1},()=>new Array(m+1).fill(0));
- const sc=(x,y)=>{const q=sim(T[x].k,Hh[y]);return q>=.5?1-q:1.2};
- for(let i=1;i<=n;i++){D[i][0]=i;P[i][0]=1}for(let j=1;j<=m;j++){D[0][j]=j;P[0][j]=2}
- for(let i=1;i<=n;i++)for(let j=1;j<=m;j++){const a=D[i-1][j-1]+sc(i-1,j-1),b=D[i-1][j]+1,c=D[i][j-1]+1,mn=Math.min(a,b,c);D[i][j]=mn;P[i][j]=mn==a?0:mn==b?1:2}
- let i=n,j=m,extra=0;
- while(i>0||j>0){const p=(i>0&&j>0)?P[i][j]:(i>0?1:2);
-  if(p==0){const q=sim(T[i-1].k,Hh[j-1]);T[i-1].heard=Hh[j-1];T[i-1].st=q>=.85?'ok':q>=.6?'near':'bad';i--;j--}
-  else if(p==1){T[i-1].st='miss';i--}else{extra++;j--}}
- const cnt={ok:0,near:0,bad:0,miss:0};T.forEach(w=>cnt[w.st]++);
- const ays={};for(let a=f;a<=t;a++){const ws=T.filter(w=>w.ay==a),bad=ws.some(w=>w.st=='bad'),soft=ws.some(w=>w.st=='near'||w.st=='miss');ays[a]={ws,v:bad?'r':soft?'y':'g'}}
- return{heard:String(heardRaw||'').trim(),total:n,acc:n?(cnt.ok+.5*cnt.near)/n:0,cnt,extra,ays}}
-//CHECKER>
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      // ===== Pengenalan suara (Web Speech API, bahasa Arab) =====
+      const SRC = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let SR = null,
+        SRwant = 0,
+        SRactive = 0,
+        SRfin = null;
+      function srBegin() {
+        try {
+          SR = new SRC();
+          SR.lang = "ar-SA";
+          SR.continuous = true;
+          SR.interimResults = true;
+          SR.maxAlternatives = 1;
+          SR.onstart = () => {
+            SRactive = 1;
+          };
+          SR.onresult = (e) => {
+            const t = [...e.results]
+              .map((r) => r[0].transcript.trim())
+              .filter(Boolean);
+            H.sess = t
+              .filter((x, i) => !(i < t.length - 1 && t[i + 1].startsWith(x)))
+              .join(" ");
+            R();
+          };
+          SR.onerror = (e) => {
+            const er = e.error;
+            if (er == "not-allowed" || er == "service-not-allowed") {
+              SRwant = 0;
+              H.rec = 0;
+              H.err =
+                "Izin mikrofon ditolak. Aktifkan izin mikrofon untuk situs ini lalu coba lagi.";
+            } else if (er == "audio-capture") {
+              SRwant = 0;
+              H.rec = 0;
+              H.err = "Mikrofon tidak ditemukan.";
+            } else if (er == "network") {
+              SRwant = 0;
+              H.rec = 2;
+              H.err =
+                "Pengenalan suara butuh koneksi internet. Periksa jaringan lalu lanjutkan.";
+            }
+            R();
+          };
+          SR.onend = () => {
+            SRactive = 0;
+            H.tx = ((H.tx || "") + " " + (H.sess || "")).trim();
+            H.sess = "";
+            if (SRwant && H.st == "rec" && H.rec == 1)
+              setTimeout(() => {
+                if (SRwant && H.st == "rec" && H.rec == 1 && !SRactive)
+                  srBegin();
+              }, 250);
+            else if (SRfin) {
+              const f = SRfin;
+              SRfin = null;
+              f();
+            }
+            R();
+          };
+          SR.start();
+        } catch (x) {
+          H.err = "Gagal memulai pengenalan suara.";
+          H.rec = 0;
+        }
+      }
+      function srStop() {
+        SRwant = 0;
+        try {
+          SR && SR.stop();
+        } catch (x) {}
+      }
+      function srAbort() {
+        SRwant = 0;
+        SRfin = null;
+        try {
+          SR && SR.abort();
+        } catch (x) {}
+        SRactive = 0;
+      }
+      function finishCheck() {
+        SRfin = null;
+        if (H.st != "rec") return;
+        H.res = checkRecitation(
+          H.s,
+          H.f,
+          H.t,
+          ((H.tx || "") + " " + (H.sess || "")).trim(),
+        );
+        H.mk = {};
+        if (H.res.heard && H.res.total)
+          for (const n in H.res.ays) H.mk[n] = H.res.ays[n].v;
+        H.rec = 3;
+        H.st = "eval";
+      }
 
-// ===== Pengenalan suara (Web Speech API, bahasa Arab) =====
-const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
-let SR=null,SRwant=0,SRactive=0,SRfin=null;
-function srBegin(){
- try{SR=new SRC();SR.lang='ar-SA';SR.continuous=true;SR.interimResults=true;SR.maxAlternatives=1;
-  SR.onstart=()=>{SRactive=1};
-  SR.onresult=e=>{const t=[...e.results].map(r=>r[0].transcript.trim()).filter(Boolean);
-   H.sess=t.filter((x,i)=>!(i<t.length-1&&t[i+1].startsWith(x))).join(' ');R()};
-  SR.onerror=e=>{const er=e.error;
-   if(er=='not-allowed'||er=='service-not-allowed'){SRwant=0;H.rec=0;H.err='Izin mikrofon ditolak. Aktifkan izin mikrofon untuk situs ini lalu coba lagi.'}
-   else if(er=='audio-capture'){SRwant=0;H.rec=0;H.err='Mikrofon tidak ditemukan.'}
-   else if(er=='network'){SRwant=0;H.rec=2;H.err='Pengenalan suara butuh koneksi internet. Periksa jaringan lalu lanjutkan.'}
-   R()};
-  SR.onend=()=>{SRactive=0;H.tx=((H.tx||'')+' '+(H.sess||'')).trim();H.sess='';
-   if(SRwant&&H.st=='rec'&&H.rec==1)setTimeout(()=>{if(SRwant&&H.st=='rec'&&H.rec==1&&!SRactive)srBegin()},250);
-   else if(SRfin){const f=SRfin;SRfin=null;f()}
-   R()};
-  SR.start()}catch(x){H.err='Gagal memulai pengenalan suara.';H.rec=0}}
-function srStop(){SRwant=0;try{SR&&SR.stop()}catch(x){}}
-function srAbort(){SRwant=0;SRfin=null;try{SR&&SR.abort()}catch(x){}SRactive=0}
-function finishCheck(){SRfin=null;if(H.st!='rec')return;
- H.res=checkRecitation(H.s,H.f,H.t,((H.tx||'')+' '+(H.sess||'')).trim());H.mk={};
- if(H.res.heard&&H.res.total)for(const n in H.res.ays)H.mk[n]=H.res.ays[n].v;
- H.rec=3;H.st='eval'}
-
-const O={tab(v){S.tab=v;S.scr='';S.st=[]},go(v){S.st.push(S.scr);S.scr=v;if(v=='hafal')H={st:'pick',s:H.s,f:1,t:Math.min(3,SU[H.s].a.length),rep:5,cu:0,focus:0,c:0,hide:0,peek:0,rec:0,rt:0,mk:{},ab:0}},back(){S.scr=S.st.pop()||''},mclose(){S.m=null},prev,pv:prev,
-tl(v){T.m=v;O.go('tilawah')},tm(v){T.m=v},ts(v){T.s=+v;T.f=1;T.t=Math.min(7,SU[T.s].a.length);T.p=1},tz(k,d){const n=SU[T.s].a.length;T[k]+=+d;T.f=cl(T.f,1,n);T.t=cl(T.t,T.f,n);T.p=cl(T.p,T.f,T.t)},tp(d){T.p=cl(T.p+ +d,T.f,T.t)},
-tmin(v){if(!T.run&&!T.el){T.min=+v;T.left=T.min*60}},trun(){T.run=!T.run},tend(){T.run=0;S.m={t:'Ringkasan tilawah',b:`Durasi terbaca ${mm(T.el)} dari target ${T.min} menit.`};log('Tilawah '+mm(T.el));T.el=0;T.left=T.min*60},
-tu(v){T.u=v;T.d=0},tn(d){T.n=Math.max(1,T.n+ +d)},trs(){T.d=0},tdone(){T.d++;if(T.d>=T.n){S.m={t:'Target tercapai',b:`${T.n} ${T.u.toLowerCase()} selesai dibaca.`};log(`Tilawah target ${T.n} ${T.u.toLowerCase()}`);T.d=0}},
-hs(v){H.s=+v;H.f=1;H.t=Math.min(3,SU[H.s].a.length)},hz(k,d){const n=SU[H.s].a.length;H[k]+=+d;H.f=cl(H.f,1,n);H.t=cl(H.t,H.f,n)},hset(){H.st='set'},hrep(v){H.rep=+v;H.cu=0},hcu(){H.cu=1},hrn(d){H.rep=cl(H.rep+ +d,1,100)},hfoc(){H.focus=!H.focus},hstart(){H.st='rep';H.c=0},hread(){H.c++},htest(){if(H.c>=H.rep){H.st='test';H.hide=0}},hhide(){H.hide=!H.hide},hrec(){srAbort();H.st='rec';H.rec=0;H.rt=0;H.tx='';H.sess='';H.man='';H.err='';H.res=null},rc(v){v=+v;
- if(v==1){H.err='';if(!SRC){H.err='Browser ini belum mendukung pengenalan suara. Pakai Chrome atau Edge, atau uji dengan teks manual di bawah.';return}
-  H.rec=1;SRwant=1;if(!SRactive)srBegin()}
- else if(v==2){H.rec=2;srStop()}
- else{if(SRactive){H.rec=3;SRfin=finishCheck;srStop();setTimeout(()=>{if(H.st=='rec'&&H.rec==3){finishCheck();R()}},1800)}else finishCheck()}},
-rcm(){if(!(H.man||'').trim())return;srAbort();H.tx=H.man.trim();H.sess='';finishCheck()},hm(n,g){H.mk[n]=g},
-hfin(){for(let n=H.f;n<=H.t;n++){const k=H.mk[n]||'y';if(k=='g'){G.tot++;G.today++;const e=M.find(x=>x.s==H.s&&x.n==n);if(e)e.st='lancar'}else{const e=M.find(x=>x.s==H.s&&x.n==n);if(e){e.st=k=='r'?'ulang':'belajar';e.err+=k=='r'?1:0;e.due='Hari ini'}else M.push({s:H.s,n,st:k=='r'?'ulang':'belajar',due:'Hari ini',err:k=='r'?1:0})}}log(`Hafalan ${SU[H.s].n} : ${H.f}–${H.t}`);H.st='done'},
-hmur(){S.st=[''];S.scr='muraja'},ask(v){S.m={t:v=='e'?'Keluar darurat?':'Akhiri sesi hafalan?',b:'Sesi dihentikan dan progres sesi ini tidak disimpan.'+(H.focus?' Focus Mode akan dimatikan dan pengaturan fokus dipulihkan (simulasi).':''),bt:[['Lanjutkan sesi','mclose','o'],['Akhiri sesi','endH','rd']]}},endH(){srAbort();S.m=null;H.st='done';H.ab=1},
-mf(v){F=v},mo(i){const x=M[i];S.m={t:`${SU[x.s].n} : ${x.n}`,h:`<div class=ar>${SU[x.s].a[x.n-1]}</div>`,bt:[['Tandai lancar','mset:'+i+':lancar'],['Perlu diulang','mset:'+i+':ulang','o'],['Tutup','mclose','o']]}},mset(i,v){M[i].st=v;if(v=='lancar'){M[i].due='Minggu ini';log('Muraja\'ah '+SU[M[i].s].n+' : '+M[i].n)}S.m=null},tj(i){S.tj=S.tj==i?-1:+i},
-q(k){startQ(k);O.go('quiz')},pick(i){const q=Q.l[Q.i];Q.sel=+i;if(+i==q.a){Q.ok++;Q.st++;Q.best=Math.max(Q.best,Q.st)}else{Q.no++;Q.st=0;Q.bad.push(q)}},ad(i){Q.seq.push(+i)},un(i){Q.seq=Q.seq.filter(x=>x!=i)},
-chk(){const q=Q.l[Q.i],ok=Q.seq.map(i=>q.ws[i]).join(' ')==q.ans;Q.sel=ok?1:0;if(ok){Q.ok++;Q.st++;Q.best=Math.max(Q.best,Q.st)}else{Q.no++;Q.st=0;Q.bad.push(q)}},nx(){Q.i++;Q.sel=null;Q.seq=[];if(Q.i>=Q.l.length)fin()},
-retry(){startQ(Q.k);S.scr='quiz'},after(){const e=Q.k=='ujian';S.tab=e?S.tab:'lcc';S.scr=e?'sert':'';S.st=e?['']:[]},cert(i){S.ec=+i||0;O.go('cert')},sl(i){S.sl=+i},
-pf(k){P[k]=!P[k]},az(d){const e=document.documentElement,v=cl(parseInt(getComputedStyle(e).getPropertyValue('--az'))+ +d*2,22,44);e.style.setProperty('--az',v+'px')},th(v){P.th=v;if(v=='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.dataset.theme=v}};
-function A(x){const[c,v,w]=x.split(':');O[c](v,w);R()}
-function R(){const v=$('#v'),y=v?v.scrollTop:0,key=S.tab+S.scr+H.st+(Q?Q.i:'')+T.m+S.m;
-const pg={'':()=>({home,learn,lcc,prof})[S.tab](),tilawah,muraja,hafal,tajwid,quiz,res,sert,sertex,cert}[S.scr]();
-const m=S.m?`<div class=ov onclick="if(event.target==this)A('mclose')"><div class=sh><h3>${S.m.t}</h3>${S.m.b?`<p>${S.m.b}</p>`:''}${S.m.h||''}${(S.m.bt||[['Tutup','mclose']]).map(x=>B(x[0],x[1],x[2]||'')).join('')}</div></div>`:'';
-const nav=S.scr?'':`<nav>${[['home','🏠','Beranda'],['learn','📖','Belajar'],['lcc','🏆','LCC'],['prof','👤','Profil']].map(x=>`<button class="${S.tab==x[0]?'on':''}" onclick="A('tab:${x[0]}')"><i>${x[1]}</i>${x[2]}</button>`).join('')}</nav>`;
-$('#app').innerHTML=`<div id=v>${pg}</div>${nav}${m}${S.ts?`<div class=ts>${S.ts}</div>`:''}`;const n=$('#v');if(R.k==key)n.scrollTop=y;R.k=key}
-setInterval(()=>{let c=0;if(T.run){T.left--;T.el++;c=1;if(T.left<=0)O.tend()}if(S.scr=='hafal'&&H.st=='rec'&&H.rec==1){H.rt++;c=1}if(Q&&!Q.done&&Q.k=='tantang'&&S.scr=='quiz'){Q.left--;c=1;if(Q.left<=0)fin()}if(c)R()},1000);
-R();
-</script></body></html>
+      const O = {
+        tab(v) {
+          S.tab = v;
+          S.scr = "";
+          S.st = [];
+        },
+        go(v) {
+          S.st.push(S.scr);
+          S.scr = v;
+          if (v == "hafal")
+            H = {
+              st: "pick",
+              s: H.s,
+              f: 1,
+              t: Math.min(3, SU[H.s].a.length),
+              rep: 5,
+              cu: 0,
+              focus: 0,
+              c: 0,
+              hide: 0,
+              peek: 0,
+              rec: 0,
+              rt: 0,
+              mk: {},
+              ab: 0,
+            };
+        },
+        back() {
+          S.scr = S.st.pop() || "";
+        },
+        mclose() {
+          S.m = null;
+        },
+        prev,
+        pv: prev,
+        tl(v) {
+          T.m = v;
+          O.go("tilawah");
+        },
+        tm(v) {
+          T.m = v;
+        },
+        ts(v) {
+          T.s = +v;
+          T.f = 1;
+          T.t = Math.min(7, SU[T.s].a.length);
+          T.p = 1;
+        },
+        tz(k, d) {
+          const n = SU[T.s].a.length;
+          T[k] += +d;
+          T.f = cl(T.f, 1, n);
+          T.t = cl(T.t, T.f, n);
+          T.p = cl(T.p, T.f, T.t);
+        },
+        tp(d) {
+          T.p = cl(T.p + +d, T.f, T.t);
+        },
+        tmin(v) {
+          if (!T.run && !T.el) {
+            T.min = +v;
+            T.left = T.min * 60;
+          }
+        },
+        trun() {
+          T.run = !T.run;
+        },
+        tend() {
+          T.run = 0;
+          S.m = {
+            t: "Ringkasan tilawah",
+            b: `Durasi terbaca ${mm(T.el)} dari target ${T.min} menit.`,
+          };
+          log("Tilawah " + mm(T.el));
+          T.el = 0;
+          T.left = T.min * 60;
+        },
+        tu(v) {
+          T.u = v;
+          T.d = 0;
+        },
+        tn(d) {
+          T.n = Math.max(1, T.n + +d);
+        },
+        trs() {
+          T.d = 0;
+        },
+        tdone() {
+          T.d++;
+          if (T.d >= T.n) {
+            S.m = {
+              t: "Target tercapai",
+              b: `${T.n} ${T.u.toLowerCase()} selesai dibaca.`,
+            };
+            log(`Tilawah target ${T.n} ${T.u.toLowerCase()}`);
+            T.d = 0;
+          }
+        },
+        hs(v) {
+          H.s = +v;
+          H.f = 1;
+          H.t = Math.min(3, SU[H.s].a.length);
+        },
+        hz(k, d) {
+          const n = SU[H.s].a.length;
+          H[k] += +d;
+          H.f = cl(H.f, 1, n);
+          H.t = cl(H.t, H.f, n);
+        },
+        hset() {
+          H.st = "set";
+        },
+        hrep(v) {
+          H.rep = +v;
+          H.cu = 0;
+        },
+        hcu() {
+          H.cu = 1;
+        },
+        hrn(d) {
+          H.rep = cl(H.rep + +d, 1, 100);
+        },
+        hfoc() {
+          H.focus = !H.focus;
+        },
+        hstart() {
+          H.st = "rep";
+          H.c = 0;
+        },
+        hread() {
+          H.c++;
+        },
+        htest() {
+          if (H.c >= H.rep) {
+            H.st = "test";
+            H.hide = 0;
+          }
+        },
+        hhide() {
+          H.hide = !H.hide;
+        },
+        hrec() {
+          srAbort();
+          H.st = "rec";
+          H.rec = 0;
+          H.rt = 0;
+          H.tx = "";
+          H.sess = "";
+          H.man = "";
+          H.err = "";
+          H.res = null;
+        },
+        rc(v) {
+          v = +v;
+          if (v == 1) {
+            H.err = "";
+            if (!SRC) {
+              H.err =
+                "Browser ini belum mendukung pengenalan suara. Pakai Chrome atau Edge, atau uji dengan teks manual di bawah.";
+              return;
+            }
+            H.rec = 1;
+            SRwant = 1;
+            if (!SRactive) srBegin();
+          } else if (v == 2) {
+            H.rec = 2;
+            srStop();
+          } else {
+            if (SRactive) {
+              H.rec = 3;
+              SRfin = finishCheck;
+              srStop();
+              setTimeout(() => {
+                if (H.st == "rec" && H.rec == 3) {
+                  finishCheck();
+                  R();
+                }
+              }, 1800);
+            } else finishCheck();
+          }
+        },
+        rcm() {
+          if (!(H.man || "").trim()) return;
+          srAbort();
+          H.tx = H.man.trim();
+          H.sess = "";
+          finishCheck();
+        },
+        hm(n, g) {
+          H.mk[n] = g;
+        },
+        hfin() {
+          for (let n = H.f; n <= H.t; n++) {
+            const k = H.mk[n] || "y";
+            if (k == "g") {
+              G.tot++;
+              G.today++;
+              const e = M.find((x) => x.s == H.s && x.n == n);
+              if (e) e.st = "lancar";
+            } else {
+              const e = M.find((x) => x.s == H.s && x.n == n);
+              if (e) {
+                e.st = k == "r" ? "ulang" : "belajar";
+                e.err += k == "r" ? 1 : 0;
+                e.due = "Hari ini";
+              } else
+                M.push({
+                  s: H.s,
+                  n,
+                  st: k == "r" ? "ulang" : "belajar",
+                  due: "Hari ini",
+                  err: k == "r" ? 1 : 0,
+                });
+            }
+          }
+          log(`Hafalan ${SU[H.s].n} : ${H.f}–${H.t}`);
+          H.st = "done";
+        },
+        hmur() {
+          S.st = [""];
+          S.scr = "muraja";
+        },
+        ask(v) {
+          S.m = {
+            t: v == "e" ? "Keluar darurat?" : "Akhiri sesi hafalan?",
+            b:
+              "Sesi dihentikan dan progres sesi ini tidak disimpan." +
+              (H.focus
+                ? " Focus Mode akan dimatikan dan pengaturan fokus dipulihkan (simulasi)."
+                : ""),
+            bt: [
+              ["Lanjutkan sesi", "mclose", "o"],
+              ["Akhiri sesi", "endH", "rd"],
+            ],
+          };
+        },
+        endH() {
+          srAbort();
+          S.m = null;
+          H.st = "done";
+          H.ab = 1;
+        },
+        mf(v) {
+          F = v;
+        },
+        mo(i) {
+          const x = M[i];
+          S.m = {
+            t: `${SU[x.s].n} : ${x.n}`,
+            h: `<div class=ar>${SU[x.s].a[x.n - 1]}</div>`,
+            bt: [
+              ["Tandai lancar", "mset:" + i + ":lancar"],
+              ["Perlu diulang", "mset:" + i + ":ulang", "o"],
+              ["Tutup", "mclose", "o"],
+            ],
+          };
+        },
+        mset(i, v) {
+          M[i].st = v;
+          if (v == "lancar") {
+            M[i].due = "Minggu ini";
+            log("Muraja'ah " + SU[M[i].s].n + " : " + M[i].n);
+          }
+          S.m = null;
+        },
+        tj(i) {
+          S.tj = S.tj == i ? -1 : +i;
+        },
+        q(k) {
+          startQ(k);
+          O.go("quiz");
+        },
+        pick(i) {
+          const q = Q.l[Q.i];
+          Q.sel = +i;
+          if (+i == q.a) {
+            Q.ok++;
+            Q.st++;
+            Q.best = Math.max(Q.best, Q.st);
+          } else {
+            Q.no++;
+            Q.st = 0;
+            Q.bad.push(q);
+          }
+        },
+        ad(i) {
+          Q.seq.push(+i);
+        },
+        un(i) {
+          Q.seq = Q.seq.filter((x) => x != i);
+        },
+        chk() {
+          const q = Q.l[Q.i],
+            ok = Q.seq.map((i) => q.ws[i]).join(" ") == q.ans;
+          Q.sel = ok ? 1 : 0;
+          if (ok) {
+            Q.ok++;
+            Q.st++;
+            Q.best = Math.max(Q.best, Q.st);
+          } else {
+            Q.no++;
+            Q.st = 0;
+            Q.bad.push(q);
+          }
+        },
+        nx() {
+          Q.i++;
+          Q.sel = null;
+          Q.seq = [];
+          if (Q.i >= Q.l.length) fin();
+        },
+        retry() {
+          startQ(Q.k);
+          S.scr = "quiz";
+        },
+        after() {
+          const e = Q.k == "ujian";
+          S.tab = e ? S.tab : "lcc";
+          S.scr = e ? "sert" : "";
+          S.st = e ? [""] : [];
+        },
+        cert(i) {
+          S.ec = +i || 0;
+          O.go("cert");
+        },
+        sl(i) {
+          S.sl = +i;
+        },
+        pf(k) {
+          P[k] = !P[k];
+        },
+        az(d) {
+          const e = document.documentElement,
+            v = cl(
+              parseInt(getComputedStyle(e).getPropertyValue("--az")) + +d * 2,
+              22,
+              44,
+            );
+          e.style.setProperty("--az", v + "px");
+        },
+        th(v) {
+          P.th = v;
+          if (v == "auto")
+            document.documentElement.removeAttribute("data-theme");
+          else document.documentElement.dataset.theme = v;
+        },
+      };
+      function A(x) {
+        const [c, v, w] = x.split(":");
+        O[c](v, w);
+        R();
+      }
+      function R() {
+        const v = $("#v"),
+          y = v ? v.scrollTop : 0,
+          key = S.tab + S.scr + H.st + (Q ? Q.i : "") + T.m + S.m;
+        const pg = {
+          "": () => ({ home, learn, lcc, prof })[S.tab](),
+          tilawah,
+          muraja,
+          hafal,
+          tajwid,
+          quiz,
+          res,
+          sert,
+          sertex,
+          cert,
+        }[S.scr]();
+        const m = S.m
+          ? `<div class=ov onclick="if(event.target==this)A('mclose')"><div class=sh><h3>${S.m.t}</h3>${S.m.b ? `<p>${S.m.b}</p>` : ""}${S.m.h || ""}${(S.m.bt || [["Tutup", "mclose"]]).map((x) => B(x[0], x[1], x[2] || "")).join("")}</div></div>`
+          : "";
+        const nav = S.scr
+          ? ""
+          : `<nav>${[
+              ["home", "🏠", "Beranda"],
+              ["learn", "📖", "Belajar"],
+              ["lcc", "🏆", "LCC"],
+              ["prof", "👤", "Profil"],
+            ]
+              .map(
+                (x) =>
+                  `<button class="${S.tab == x[0] ? "on" : ""}" onclick="A('tab:${x[0]}')"><i>${x[1]}</i>${x[2]}</button>`,
+              )
+              .join("")}</nav>`;
+        $("#app").innerHTML =
+          `<div id=v>${pg}</div>${nav}${m}${S.ts ? `<div class=ts>${S.ts}</div>` : ""}`;
+        const n = $("#v");
+        if (R.k == key) n.scrollTop = y;
+        R.k = key;
+      }
+      setInterval(() => {
+        let c = 0;
+        if (T.run) {
+          T.left--;
+          T.el++;
+          c = 1;
+          if (T.left <= 0) O.tend();
+        }
+        if (S.scr == "hafal" && H.st == "rec" && H.rec == 1) {
+          H.rt++;
+          c = 1;
+        }
+        if (Q && !Q.done && Q.k == "tantang" && S.scr == "quiz") {
+          Q.left--;
+          c = 1;
+          if (Q.left <= 0) fin();
+        }
+        if (c) R();
+      }, 1000);
+      R();
+    </script>
+  </body>
+</html>

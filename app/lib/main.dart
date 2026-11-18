@@ -5,18 +5,18 @@ import 'theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const HifzFlowApp());
+  runApp(const focusHifzApp());
 }
 
-class HifzFlowApp extends StatelessWidget {
-  const HifzFlowApp({super.key});
+class focusHifzApp extends StatelessWidget {
+  const focusHifzApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: app,
       builder: (context, _) => MaterialApp(
-        title: 'HifzFlow',
+        title: 'flowHifz',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
