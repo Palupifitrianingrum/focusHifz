@@ -14,7 +14,16 @@ Pengaturan cepat (di kode):
 - `lib/lock.dart` → `modeUji` (true = ada tombol "Keluar (mode uji)" saat terkunci)
 - `lib/pages/hafal.dart` → `kAkurasiUlang` (0.6), `kAkurasiUji` (0.7), `kMaxGagal` (3)
 
+Mushaf & murottal:
+- Tab **Mushaf**: 114 surah, teks Utsmani bertajwid dari API quran.com (`lib/quran_api.dart`).
+  Huruf berwarna bisa diketuk untuk melihat hukumnya (`lib/tajweed.dart`); tiap ayat juga punya
+  tombol daftar hukum tajwid. Teks tersimpan di HP setelah dibuka sekali.
+- **Murottal** (`lib/murottal.dart`, `lib/pages/murottal_page.dart`): audio per ayat dari everyayah.com.
+  Qari bisa dipilih dari seluruh daftar online (bawaan: Abdurrahmaan As-Sudais 64 kbps), lalu diunduh
+  semua, per surah, atau rentang ayat. File yang sudah diunduh diputar offline.
+- Nama, tema, ukuran huruf, qari, dan posisi terakhir dibaca tersimpan di `pengaturan.json`.
+
 Build lokal: `flutter create --org com.fokus --project-name fokus_hafalan --platforms android .`
-lalu `flutter pub add speech_to_text:^7.0.0 google_fonts`, salin `app/lib/*` ke `lib/`,
+lalu `flutter pub add speech_to_text:^7.0.0 google_fonts http path_provider just_audio`, salin `app/lib/*` ke `lib/`,
 `MainActivity.kt` ke `android/app/src/main/kotlin/com/fokus/fokus_hafalan/`, dan tambahkan permission
 RECORD_AUDIO + INTERNET + ACCESS_NOTIFICATION_POLICY di AndroidManifest (lihat build.yml).
