@@ -189,7 +189,10 @@ class HomeTab extends StatelessWidget {
           right: -40,
           top: -40,
           child: ExcludeSemantics(
-            child: Opacity(opacity: .14, child: RubBadge(size: 170, fill: pl.gold)),
+            child: Opacity(
+              opacity: .14,
+              child: RubBadge(size: 170, fill: pl.gold, child: const SizedBox.shrink()),
+            ),
           ),
         ),
         Padding(

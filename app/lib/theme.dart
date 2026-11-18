@@ -127,7 +127,31 @@ ThemeData buildTheme(Brightness b) {
     colorScheme: scheme,
     focusColor: pl.green.withValues(alpha: .22),
   );
-  final tt = GoogleFonts.plusJakartaSansTextTheme(base.textTheme)
+  // Tema teks dibangun dari textTheme milik ThemeData itu sendiri (tanpa menyebut
+  // nama tipe TextTheme dan tanpa GoogleFonts.*TextTheme), sehingga tidak bisa
+  // bentrok antara TextTheme Flutter Material dan TextTheme package material_ui.
+  // GoogleFonts.plusJakartaSans(textStyle:) hanya memakai TextStyle dari painting.
+  final t0 = base.textTheme;
+  TextStyle? jakarta(TextStyle? s) =>
+      s == null ? null : GoogleFonts.plusJakartaSans(textStyle: s);
+  final tt = t0
+      .copyWith(
+        displayLarge: jakarta(t0.displayLarge),
+        displayMedium: jakarta(t0.displayMedium),
+        displaySmall: jakarta(t0.displaySmall),
+        headlineLarge: jakarta(t0.headlineLarge),
+        headlineMedium: jakarta(t0.headlineMedium),
+        headlineSmall: jakarta(t0.headlineSmall),
+        titleLarge: jakarta(t0.titleLarge),
+        titleMedium: jakarta(t0.titleMedium),
+        titleSmall: jakarta(t0.titleSmall),
+        bodyLarge: jakarta(t0.bodyLarge),
+        bodyMedium: jakarta(t0.bodyMedium),
+        bodySmall: jakarta(t0.bodySmall),
+        labelLarge: jakarta(t0.labelLarge),
+        labelMedium: jakarta(t0.labelMedium),
+        labelSmall: jakarta(t0.labelSmall),
+      )
       .apply(bodyColor: pl.text, displayColor: pl.text);
   return base.copyWith(
     textTheme: tt,
