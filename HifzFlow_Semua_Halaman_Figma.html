@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=1960">
+<title>HifzFlow – Semua Halaman (untuk html.to.design)</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Fraunces:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{--g:#0f5c4a;--g2:#0a3d31;--c:#f7f1e3;--w:#fffdf7;--au:#c9a24b;--t:#1d2b26;--m:#667a71;--r:#c0392b;--y:#d9a400;--ok:#1e8e5a;--ln:#e6dcc3;--az:30px;color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}body{background:#cfc8b4;font:15px/1.45 Inter,Inter,system-ui,sans-serif;color:var(--t)}
+#app{max-width:430px;height:100%;margin:auto;background:var(--c);display:flex;flex-direction:column;position:relative;overflow:hidden;padding-top:env(safe-area-inset-top,0)}
+#v{flex:1;overflow:auto;padding:16px 16px 28px}#v.foc{background:var(--c)}
+h2,h3{font-family:Fraunces,Georgia,serif;margin:0}h2{font-size:24px;line-height:1.2}h3{font-size:19px}h4{margin:18px 0 8px;font-size:15px}
+p{margin:6px 0}small,.mu{color:var(--m)}
+.hero{background:linear-gradient(150deg,var(--g2),var(--g));color:#fff;border-radius:22px;padding:20px;margin-bottom:14px;border-bottom:3px solid var(--au)}
+.hero p{opacity:.9}.hero small{color:#e9dfb8}
+.card{background:var(--w);border:1px solid var(--ln);border-radius:16px;padding:14px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:12px}.sp2{justify-content:space-between}
+.b{border:0;border-radius:14px;padding:13px 16px;font:600 15px Inter,system-ui,sans-serif;background:var(--g);color:#fff;width:100%;margin-top:8px;cursor:pointer}
+.b.o{background:transparent;color:var(--g);border:1.5px solid var(--g)}.b.au{background:var(--au);color:#2a2108}.b.rd{background:var(--r)}.b[disabled]{opacity:.4}
+.ch{border:1.5px solid var(--ln);background:var(--w);color:var(--t);border-radius:99px;padding:8px 14px;font:500 14px Inter,system-ui,sans-serif;margin:0 6px 6px 0;cursor:pointer}.ch.on{background:var(--g);color:#fff;border-color:var(--g)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.g2{grid-template-columns:1fr 1fr}
+.tile{background:var(--w);border:1px solid var(--ln);border-radius:16px;padding:14px 6px;text-align:center;font:600 13px Inter,system-ui,sans-serif;color:var(--t);cursor:pointer}.tile i{display:block;font-style:normal;font-size:24px;margin-bottom:4px}
+.bar{height:8px;background:var(--ln);border-radius:9px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--au));border-radius:9px}
+.bd{font:600 12px Inter,system-ui,sans-serif;padding:3px 9px;border-radius:99px;background:var(--ln);color:var(--t)}.bd.g{background:#d5efe1;color:#0f5a37}.bd.y{background:#fbefc2;color:#7a5a00}.bd.r{background:#f6d6d2;color:#8e2418}
+.hd{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bk{border:0;background:var(--w);border-radius:12px;width:38px;height:38px;font-size:22px;color:var(--t);cursor:pointer;border:1px solid var(--ln)}
+.ar{font-family:Amiri,'Scheherazade New',serif;font-size:var(--az);line-height:2.1;text-align:center;direction:rtl}.ar .nm{font-size:.6em;color:var(--au)}
+.mush{background:var(--w);border:2px solid var(--au);border-radius:18px;padding:18px 12px;margin:10px 0;box-shadow:inset 0 0 0 4px var(--c)}
+.seg{display:flex;background:var(--ln);border-radius:14px;padding:4px;margin-bottom:12px}.seg button{flex:1;border:0;background:none;padding:9px 4px;border-radius:11px;font:600 13px Inter,system-ui,sans-serif;color:var(--m);cursor:pointer}.seg .on{background:var(--w);color:var(--g)}
+.sp{display:flex;align-items:center;gap:10px;margin:8px 0}.sp span{flex:1}.sp button{width:36px;height:36px;border-radius:11px;border:1px solid var(--ln);background:var(--w);color:var(--t);font-size:18px;cursor:pointer}.sp b{min-width:28px;text-align:center}
+nav{display:flex;background:var(--w);border-top:1px solid var(--ln);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0))}nav button{flex:1;border:0;background:none;padding:6px;font:600 12px Inter,system-ui,sans-serif;color:var(--m);cursor:pointer}nav i{display:block;font-style:normal;font-size:21px}nav .on{color:var(--g)}
+.ov{position:absolute;inset:0;background:#0007;display:flex;align-items:flex-end;z-index:9}.sh{background:var(--w);width:100%;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0));max-height:85%;overflow:auto}
+.ts{position:absolute;left:16px;right:16px;bottom:90px;background:#1d2b26;color:#fff;border-radius:12px;padding:12px;text-align:center;z-index:10;font-size:14px}
+.opt{display:block;width:100%;text-align:center;padding:13px;margin-top:8px;border-radius:14px;border:1.5px solid var(--ln);background:var(--w);color:var(--t);font:500 15px Inter,system-ui,sans-serif;cursor:pointer}.opt.ar{font:var(--az) Amiri,serif;font-size:24px;line-height:1.8}.opt.ok{background:#d5efe1;border-color:var(--ok);color:#0f5a37}.opt.no{background:#f6d6d2;border-color:var(--r);color:#8e2418}
+.fb{background:var(--g2);color:#fff;border-radius:12px;padding:9px 12px;font-size:13px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.fb button{background:#ffffff22;border:0;color:#fff;border-radius:9px;padding:6px 10px;font-weight:600;cursor:pointer}
+.wave{display:flex;gap:3px;height:70px;align-items:center;justify-content:center;margin:14px 0}.wave i{width:5px;height:12px;background:var(--g);border-radius:4px}.wave.on i{animation:w .8s ease-in-out infinite alternate}@keyframes w{to{height:64px}}
+.tg{width:52px;height:30px;border-radius:99px;background:var(--ln);position:relative;border:0;cursor:pointer;flex:none}.tg:after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}.tg.on{background:var(--g)}.tg.on:after{left:25px}
+.big{font:600 46px Fraunces,serif;text-align:center}.cert{border:3px double var(--au);background:#fffdf3;color:#2b2410;border-radius:6px;padding:22px 16px;text-align:center}.cert h2{color:#0a3d31}
+.blur{filter:blur(9px);user-select:none}.mk{display:flex;gap:6px;margin-top:6px}.mk button{flex:1;border:1.5px solid var(--ln);background:var(--w);border-radius:10px;padding:8px 2px;font:600 12px Inter,system-ui,sans-serif;color:var(--t);cursor:pointer}.mk .g{background:#d5efe1;border-color:var(--ok)}.mk .y{background:#fbefc2;border-color:var(--y)}.mk .r{background:#f6d6d2;border-color:var(--r)}
+.emp{text-align:center;padding:18px;color:var(--m)}
+
+
+html,body{height:auto}
+body{background:#e9e4d3;min-width:1960px;padding:48px 60px;font:15px/1.45 Inter,system-ui,sans-serif;color:#1d2b26}
+.top{margin-bottom:56px}.top h1{font:700 44px Fraunces,Georgia,serif;margin:0 0 8px}.top p{margin:0;color:#667a71;font-size:17px}
+.sec{margin-bottom:80px}
+.sec>h2{font:700 30px Inter,system-ui,sans-serif;margin:0 0 28px;padding-bottom:10px;border-bottom:2px solid #c9a24b;color:#1d2b26}
+.grid4{display:grid;grid-template-columns:repeat(4,430px);gap:56px 40px;align-items:start}
+.fr{margin:0}
+.fr figcaption{font:600 16px Inter,system-ui,sans-serif;margin-bottom:12px;color:#1d2b26}
+.app{width:430px;min-height:860px;background:var(--c);color:var(--t);display:flex;flex-direction:column;position:relative;overflow:hidden;border-radius:32px;border:1px solid #cfc8b4;font:15px/1.45 Inter,system-ui,sans-serif}
+.v{flex:1;padding:16px 16px 28px}
+.app.dark{--c:#0e1915;--w:#16251f;--t:#efe9d8;--m:#9fb0a8;--ln:#2a3d35;--g:#2f9a7c;color-scheme:dark;border-color:#2a3d35}
+.wave.on i{animation:none}
+
+</style></head><body>
+<div class="top"><h1>HifzFlow · Semua Halaman</h1><p>33 layar prototype dalam satu kanvas, siap diimpor ke Figma lewat html.to.design.</p></div>
+<div id="gallery"></div>
+<script>
+const SU=[{n:'Al-Fatihah',a:['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ','الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ','صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ']},{n:'Al-Ikhlas',a:['قُلْ هُوَ اللَّهُ أَحَدٌ','اللَّهُ الصَّمَدُ','لَمْ يَلِدْ وَلَمْ يُولَدْ','وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ']}];
+const V=[];SU.forEach((s,i)=>s.a.forEach((t,j)=>V.push({s:i,n:j+1,t})));
+const HK=[{q:'Lam pada "ال" di kata ini dibaca…',t:'الْحَمْدُ',r:'Alif Lam Qamariyah'},{q:'Lam pada "ال" di kata ini dibaca…',t:'الرَّحْمَٰنِ',r:'Alif Lam Syamsiyah'},{q:'Nun sukun bertemu huruf ع. Hukumnya…',t:'أَنْعَمْتَ',r:'Izhar Halqi'},{q:'Huruf د yang sukun di kata ini dibaca…',t:'لَمْ يَلِدْ',r:'Qalqalah'},{q:'Mad pada alif sebelum lam bertasydid di kata ini disebut…',t:'الضَّالِّينَ',r:'Mad Lazim'}];
+const HP=['Alif Lam Qamariyah','Alif Lam Syamsiyah','Izhar Halqi','Qalqalah','Mad Lazim','Ikhfa'];
+const TJ=[['Alif Lam Qamariyah','Lam pada "ال" dibaca jelas bila diikuti huruf qamariyah, mis. ح, ع, ك, م. Contoh: الْحَمْدُ.'],['Alif Lam Syamsiyah','Lam melebur ke huruf sesudahnya bila diikuti huruf syamsiyah, mis. ر, ص, ض, ت. Contoh: الرَّحْمَٰنِ.'],['Izhar Halqi','Nun sukun/tanwin bertemu huruf halq (ء ه ع ح غ خ) dibaca jelas tanpa dengung. Contoh: أَنْعَمْتَ.'],['Qalqalah','Huruf ق ط ب ج د yang sukun dibunyikan memantul. Contoh: يَلِدْ.'],['Mad Lazim','Huruf mad diikuti sukun asli atau tasydid dalam satu kata, dipanjangkan 6 harakat. Contoh: الضَّالِّينَ.'],['Ikhfa','Nun sukun/tanwin bertemu 15 huruf ikhfa dibaca samar disertai dengung.']];
+const L=[{n:'Level 1 · Hafalan surah pilihan',d:'Menghafal satu surah pilihan dengan lancar.',rq:[['Menghafal minimal satu surah pilihan',()=>G.tot>=4],['Lulus ujian sambung ayat (minimal 60%)',()=>C.own.length>0],['Muraja\'ah rutin 7 hari berturut-turut',()=>false]]},{n:'Level 2 · Hafalan beberapa surah',d:'Rincian persyaratan menyusul sesuai kurikulum.',rq:[],lock:1},{n:'Level 3 · Hafalan juz',d:'Rincian persyaratan menyusul sesuai kurikulum.',rq:[],lock:1}];
+let G={name:'Ahmad Fauzi',tot:14,today:2,tgt:5,til:35};
+let M=[{s:0,n:2,st:'ulang',due:'Hari ini',err:3},{s:0,n:6,st:'belajar',due:'Besok',err:1},{s:1,n:3,st:'lancar',due:'3 hari lagi',err:0},{s:1,n:1,st:'belajar',due:'Hari ini',err:2},{s:0,n:4,st:'lancar',due:'Minggu ini',err:0}];
+let F='all',LG=[{t:'Muraja\'ah Al-Fatihah : 2',d:'Kemarin'},{t:'Tilawah 15 menit',d:'2 hari lalu'}],P={notif:1,rem:1,th:'auto'},C={own:[],hist:[]};
+let T={m:'bebas',s:0,f:1,t:7,p:1,min:15,left:900,run:0,el:0,u:'Ayat',n:5,d:0},H={st:'pick',s:0,f:1,t:3,rep:5,cu:0,focus:0,c:0,hide:0,peek:0,rec:0,rt:0,mk:{},ab:0},Q=null;
+let S={tab:'home',scr:'',st:[],m:null,ts:'',tj:-1,sl:0,ec:0};
+const $=s=>document.querySelector(s),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),rnd=a=>a[Math.floor(Math.random()*a.length)],sh=a=>[...a].sort(()=>Math.random()-.5),W=t=>t.split(' ');
+const dt=()=>new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const mm=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+const ay=(s,f,t)=>SU[s].a.slice(f-1,t).map((x,i)=>x+` <span class=nm>﴿${f+i}﴾</span>`).join(' ');
+const B=(t,a,c='')=>`<button class="b ${c}" onclick="A('${a}')">${t}</button>`;
+const Ch=(t,a,on)=>`<button class="ch${on?' on':''}" onclick="A('${a}')">${t}</button>`;
+const bar=p=>`<div class=bar><i style="width:${Math.round(cl(p,0,1)*100)}%"></i></div>`;
+const bd=(t,c='')=>`<span class="bd ${c}">${t}</span>`;
+const hd=(t,b=1)=>`<div class=hd>${b?'<button class=bk onclick="A(\'back\')">‹</button>':''}<h3>${t}</h3></div>`;
+const SP=(l,v,k)=>`<div class=sp><span>${l}</span><button onclick="A('${k}:-1')">−</button><b>${v}</b><button onclick="A('${k}:1')">+</button></div>`;
+const TG=(on,a)=>`<button class="tg${on?' on':''}" onclick="A('${a}')" aria-label="ubah"></button>`;
+const ring=(p,l,sz=110)=>{const r=sz/2-9,c=2*Math.PI*r;return `<svg width=${sz} height=${sz}><circle cx=${sz/2} cy=${sz/2} r=${r} fill=none stroke="var(--ln)" stroke-width=9 /><circle cx=${sz/2} cy=${sz/2} r=${r} fill=none stroke="var(--au)" stroke-width=9 stroke-linecap=round stroke-dasharray="${c*cl(p,0,1)} ${c}" transform="rotate(-90 ${sz/2} ${sz/2})"/><text x=50% y=50% text-anchor=middle dominant-baseline=central fill="var(--t)" font-size=${sz>120?30:20} font-weight=700>${l}</text></svg>`};
+const sel=(a,k)=>SU.map((s,i)=>Ch(s.n,k+':'+i,a==i)).join('');
+const toast=m=>{S.ts=m;R();setTimeout(()=>{S.ts='';R()},2200)};
+const prev=()=>toast('Preview: belum terhubung ke backend');
+const log=t=>LG.unshift({t,d:'Baru saja'});
+const pend=()=>M.filter(x=>x.st!='lancar').length;
+
+function home(){return `<div class=hero><small>${dt()}</small><h2>Assalamu'alaikum, ${G.name}</h2><p>Semoga hari ini ringan. Hafalan terjaga oleh pengulangan kecil yang rutin, bukan oleh satu hari yang berat.</p></div>
+<div class="card row">${ring(G.today/G.tgt,G.today+'/'+G.tgt)}<div style="flex:1"><b>Target hari ini</b><p class=mu>${G.today} dari ${G.tgt} ayat</p><p>Total dihafal: <b>${G.tot} ayat</b></p><p>Sedang dipelajari: <b>${SU[H.s].n}</b></p></div></div>
+<div class=grid style="grid-template-columns:1fr 1fr"><div class=card><small>Progres tilawah</small><b> ${G.til}%</b>${bar(G.til/100)}</div><div class=card><small>Perlu muraja'ah</small><h3>${pend()} ayat</h3></div></div>
+<h4>Lanjutkan</h4>${B('Lanjutkan hafalan','go:hafal')}${B('Lanjutkan tilawah','go:tilawah','o')}${B('Lanjutkan muraja\'ah','go:muraja','o')}
+<h4>Akses cepat</h4><div class=grid>${[['📖','Tilawah','go:tilawah'],['🧠','Hafalan','go:hafal'],['🔁','Muraja\'ah','go:muraja'],['🏆','LCC','tab:lcc'],['✨','Tajwid','go:tajwid'],['🎓','Sertifikasi','go:sert']].map(x=>`<button class=tile onclick="A('${x[2]}')"><i>${x[0]}</i>${x[1]}</button>`).join('')}</div>
+<div class=card style="margin-top:14px"><b>Pengingat</b><p class=mu>Kutipan ayat dan hadis akan tampil dengan sumber yang jelas setelah konten diverifikasi. Untuk sementara: sisihkan 10 menit hari ini untuk satu muraja'ah.</p></div>`}
+function learn(){return `<h2 style="margin-bottom:12px">Belajar</h2><h4 style="margin-top:0">Tilawah</h4>
+${[['Tilawah bebas','Pilih surah dan ayat, baca dalam tampilan mushaf','bebas'],['Tilawah dengan waktu','Timer 10, 15, 30, atau 60 menit','waktu'],['Tilawah berdasarkan target','Target ayat, halaman, atau surah','target']].map(x=>`<div class="card row" onclick="A('tl:${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`).join('')}
+<h4>Hafalan</h4><div class="card row" onclick="A('go:hafal')" style="cursor:pointer;border-color:var(--au)"><div style="flex:1"><b>Mulai hafalan</b><p class=mu>Pilih ayat, ulangi, uji, rekam, lalu muraja'ah. Focus Mode tersedia sebelum sesi.</p></div>›</div>
+<div class="card row" onclick="A('go:muraja')" style="cursor:pointer"><div style="flex:1"><b>Muraja'ah</b><p class=mu>${pend()} ayat perlu diulang</p></div>›</div>
+<h4>Tajwid</h4><div class="card row" onclick="A('go:tajwid')" style="cursor:pointer"><div style="flex:1"><b>Belajar tajwid</b><p class=mu>Ringkasan hukum bacaan dan latihan</p></div>›</div>`}
+function lcc(){return `<h2 style="margin-bottom:4px">LCC Al-Qur'an</h2><p class=mu>Latihan cerdas cermat. Soal memakai surah contoh (Al-Fatihah dan Al-Ikhlas).</p>
+${[['🔗','Sambung Ayat','Pilih kelanjutan atau kata yang hilang','sambung'],['🔍','Tebak Ayat','Tebak surah dan nomor ayat','tebak'],['🧩','Susun Ayat','Urutkan potongan ayat acak','susun'],['📚','Tebak Hukum Bacaan','Nun sukun, mim sukun, mad, dan lainnya','hukum'],['⏱️','Tantangan Waktu','60 detik, skor, dan streak','tantang']].map(x=>`<div class="card row" onclick="A('q:${x[3]}')" style="cursor:pointer"><span style="font-size:28px">${x[0]}</span><div style="flex:1"><b>${x[1]}</b><p class=mu>${x[2]}</p></div>›</div>`).join('')}`}
+function prof(){const sc=C.own.length;return `<div class=card style="text-align:center"><div style="width:72px;height:72px;border-radius:50%;background:var(--g);color:#fff;font:700 28px Fraunces;display:grid;place-items:center;margin:0 auto 8px">${G.name.split(' ').map(w=>w[0]).join('')}</div><h3>${G.name}</h3><p class=mu>ahmad@contoh.id · akun contoh</p></div>
+<div class=grid><div class=card style="text-align:center"><h3>${G.tot}</h3><small>ayat hafal</small></div><div class=card style="text-align:center"><h3>6</h3><small>hari beruntun</small></div><div class=card style="text-align:center"><h3>${sc}</h3><small>sertifikat</small></div></div>
+<h4>Riwayat aktivitas</h4><div class=card>${LG.slice(0,5).map(x=>`<div class="row sp2" style="padding:5px 0"><span>${x.t}</span><small>${x.d}</small></div>`).join('')}</div>
+<div class="card row" onclick="A('go:sert')" style="cursor:pointer"><div style="flex:1"><b>Sertifikat saya</b><p class=mu>${sc?sc+' sertifikat':'Belum ada sertifikat'}</p></div>›</div>
+<h4>Pengaturan</h4><div class=card><div class="row sp2"><span>Notifikasi</span>${TG(P.notif,'pf:notif')}</div><div class="row sp2" style="margin-top:12px"><span>Pengingat muraja'ah</span>${TG(P.rem,'pf:rem')}</div></div>
+<div class=card><b>Tampilan</b>${SP('Ukuran huruf Arab',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--az')),'az')}<div style="margin-top:6px">${Ch('Otomatis','th:auto',P.th=='auto')}${Ch('Terang','th:light',P.th=='light')}${Ch('Gelap','th:dark',P.th=='dark')}</div></div><p class=mu style="text-align:center">Prototype HifzFlow · data contoh</p>`}
+
+function tilawah(){const n=SU[T.s].a.length;let b='';
+if(T.m=='bebas')b=`<div class=card><b>Surah</b><div style="margin-top:8px">${sel(T.s,'ts')}</div>${SP('Ayat awal',T.f,'tz:f')}${SP('Ayat akhir',T.t,'tz:t')}</div><div class=mush><div class=ar>${ay(T.s,T.p,T.p)}</div></div><div class="row sp2"><button class=ch onclick="A('tp:-1')">‹ Sebelumnya</button><small>Ayat ${T.p} · ${T.f}–${T.t}</small><button class=ch onclick="A('tp:1')">Berikutnya ›</button></div>${bar((T.p-T.f+1)/(T.t-T.f+1))}<small>Progres bacaan ${Math.round((T.p-T.f+1)/(T.t-T.f+1)*100)}%</small>`;
+else if(T.m=='waktu')b=`<div style="text-align:center">${[10,15,30,60].map(x=>Ch(x+' menit','tmin:'+x,T.min==x)).join('')}</div><div style="text-align:center;margin:10px 0">${ring(T.left/(T.min*60),mm(T.left),190)}</div><p class=mu style="text-align:center">${T.run?'Sedang berjalan':T.el?'Dijeda':'Siap dimulai'} · terbaca ${mm(T.el)}</p>${B(T.run?'Jeda':T.el?'Lanjutkan':'Mulai','trun')}${B('Akhiri sesi','tend','o')}`;
+else b=`<div class=card><b>Jenis target</b><div style="margin-top:8px">${['Ayat','Halaman','Surah'].map(x=>Ch(x,'tu:'+x,T.u==x)).join('')}</div>${SP('Jumlah '+T.u.toLowerCase(),T.n,'tn')}</div><div class=card><div class="row sp2"><b>Progres target</b><span>${T.d}/${T.n} ${T.u.toLowerCase()}</span></div>${bar(T.d/T.n)}</div>${B('Tandai 1 '+T.u.toLowerCase()+' selesai','tdone')}${B('Atur ulang','trs','o')}`;
+return hd('Tilawah')+`<div class=seg>${[['bebas','Bebas'],['waktu','Waktu'],['target','Target']].map(x=>`<button class="${T.m==x[0]?'on':''}" onclick="A('tm:${x[0]}')">${x[1]}</button>`).join('')}</div>`+b}
+function muraja(){const l=M.map((x,i)=>({...x,i})).filter(x=>F=='all'||x.st==F),nm={ulang:['Perlu diulang','r'],belajar:['Sedang dipelajari','y'],lancar:['Sudah lancar','g']};
+return hd('Muraja\'ah')+`<div>${[['all','Semua'],['ulang','Perlu diulang'],['belajar','Sedang dipelajari'],['lancar','Sudah lancar']].map(x=>Ch(x[1],'mf:'+x[0],F==x[0])).join('')}</div>`+(l.length?l.map(x=>`<div class=card onclick="A('mo:${x.i}')" style="cursor:pointer"><div class="row sp2"><b>${SU[x.s].n} : ${x.n}</b>${bd(nm[x.st][0],nm[x.st][1])}</div><div class=ar style="font-size:22px;line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${SU[x.s].a[x.n-1]}</div><small>Jadwal: ${x.due} · salah ${x.err}x</small></div>`).join(''):'<div class=emp>Tidak ada ayat di kategori ini.</div>')}
+function hafal(){const n=SU[H.s].a.length,sess=['rep','test','rec','eval'].includes(H.st),fb=H.focus&&sess?`<div class=fb><span>🔒 Focus Mode aktif · simulasi</span><button onclick="A('ask:e')">Keluar darurat</button></div>`:'';
+const top=sess?`<div class=hd><button class=bk onclick="A('ask:n')">✕</button><h3>${SU[H.s].n} : ${H.f}–${H.t}</h3></div>`:hd('Hafalan');let b='';
+const stp=['Pilih','Ulangi','Uji','Rekam','Evaluasi'],ix={pick:0,set:0,rep:1,test:2,rec:3,eval:4}[H.st];
+const dots=H.st=='done'?'':`<div class=row style="gap:4px;margin-bottom:10px">${stp.map((x,i)=>`<div style="flex:1"><div style="height:5px;border-radius:5px;background:${i<=ix?'var(--g)':'var(--ln)'}"></div><small style="font-size:11px">${x}</small></div>`).join('')}</div>`;
+if(H.st=='pick')b=`<div class=card><b>Pilih surah</b><div style="margin-top:8px">${sel(H.s,'hs')}</div></div><div class=card>${SP('Ayat awal',H.f,'hz:f')}${SP('Ayat akhir',H.t,'hz:t')}<p class=mu>${SU[H.s].n} · ${n} ayat · hafalan ayat ${H.f}–${H.t} (${H.t-H.f+1} ayat)</p></div>${B('Lanjut: atur pengulangan','hset')}`;
+if(H.st=='set')b=`<div class=card><b>Jumlah pengulangan</b><div style="margin-top:8px">${Ch('5x','hrep:5',!H.cu&&H.rep==5)}${Ch('10x','hrep:10',!H.cu&&H.rep==10)}${Ch('Khusus','hcu',H.cu)}</div>${H.cu?SP('Ulangi',H.rep+'x','hrn'):''}</div>
+<div class=card><div class="row sp2"><div><b>Focus Mode</b><p class=mu>Bantu menjaga konsentrasi selama sesi ini saja.</p></div>${TG(H.focus,'hfoc')}</div>${H.focus?`<p style="font-size:13px;background:var(--ln);padding:10px;border-radius:10px">Di prototype ini Focus Mode hanya <b>simulasi tampilan</b>. Pada Android nanti, pembatasan notifikasi (Jangan Ganggu) memerlukan izin Anda dan status sebelumnya akan dipulihkan. Aplikasi tidak dapat memblokir semua aplikasi lain.</p>`:''}</div>${B('Mulai sesi','hstart')}`;
+if(H.st=='rep')b=`<div class=mush><div class=ar>${ay(H.s,H.f,H.t)}</div></div><div class=card style="text-align:center"><div class=big>${H.c}<small style="font-size:20px"> / ${H.rep}</small></div><small>pengulangan</small>${bar(H.c/H.rep)}</div>${B('Saya sudah membaca','hread')}${B('Lanjut uji hafalan','htest',H.c>=H.rep?'au':'o').replace('<button','<button '+(H.c>=H.rep?'':'disabled'))}`;
+if(H.st=='test')b=`<div class=mush><div class="ar ${H.hide?'blur':''}">${ay(H.s,H.f,H.t)}</div></div>${H.hide?`<p class=mu style="text-align:center">Teks disembunyikan. Lafalkan dari ingatan.</p>`:''}${B(H.hide?'Tampilkan ayat':'Sembunyikan ayat','hhide','o')}${B('Mulai rekam','hrec')}`;
+if(H.st=='rec')b=`<div class=card style="text-align:center"><b>${['Siap merekam','Merekam…','Dijeda','Rekaman selesai'][H.rec]}</b><div class="wave ${H.rec==1?'on':''}">${Array.from({length:26},(_,i)=>`<i style="animation-delay:${i*.06}s"></i>`).join('')}</div><div class=big style="font-size:34px">${mm(H.rt)}</div><small>Simulasi: tidak ada suara yang benar-benar direkam.</small></div>${H.rec!=1?B(H.rec==2?'Lanjutkan':'Mulai','rc:1'):B('Jeda','rc:2','o')}${B('Selesai','rc:3','au').replace('<button','<button '+(H.rt?'':'disabled'))}`;
+if(H.st=='eval'){b=`<div class=card style="background:#fbefc2;color:#4a3800;border-color:var(--y)"><b>Evaluasi otomatis belum terhubung</b><p style="font-size:13px">Analisis bacaan belum tersedia di prototype. Nilai sendiri hasil hafalan Anda di bawah ini.</p></div><div class=row style="gap:6px;margin:8px 0">${bd('Hijau: benar','g')}${bd('Merah: salah','r')}${bd('Kuning: ragu / terlewat','y')}</div>`;for(let n=H.f;n<=H.t;n++){const k=H.mk[n];b+=`<div class=card><div class=ar style="font-size:22px;line-height:1.8">${SU[H.s].a[n-1]}</div><small>Ayat ${n}</small><div class=mk><button class="${k=='g'?'g':''}" onclick="A('hm:${n}:g')">Lancar</button><button class="${k=='y'?'y':''}" onclick="A('hm:${n}:y')">Ragu</button><button class="${k=='r'?'r':''}" onclick="A('hm:${n}:r')">Salah</button></div></div>`}b+=B('Simpan & lanjut muraja\'ah','hfin')}
+if(H.st=='done'){const cnt=H.t-H.f+1;b=`<div class=card style="text-align:center;margin-top:20px"><div style="font-size:50px">${H.ab?'🌙':'✅'}</div><h3>${H.ab?'Sesi diakhiri':'Sesi selesai'}</h3><p class=mu>${H.ab?'Progres sesi ini tidak disimpan.':`${cnt} ayat ${SU[H.s].n} sudah diproses. Progres hari ini ${G.today}/${G.tgt}.`}</p>${H.focus?`<p style="background:var(--ln);padding:10px;border-radius:10px;font-size:13px">Focus Mode dimatikan dan pengaturan fokus dipulihkan (simulasi).</p>`:''}</div>${H.ab?'':B('Buka muraja\'ah','hmur')}${B('Kembali ke beranda','tab:home','o')}`}
+return `${fb}${top}${dots}${b}`}
+function tajwid(){return hd('Belajar tajwid')+`<p class=mu>Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.</p>`+TJ.map((x,i)=>`<div class=card onclick="A('tj:${i}')" style="cursor:pointer"><div class="row sp2"><b>${x[0]}</b><span>${S.tj==i?'−':'+'}</span></div>${S.tj==i?`<p>${x[1]}</p>`:''}</div>`).join('')+B('Latihan tebak hukum bacaan','q:hukum')}
+
+function gen(k){
+if(k=='sambung'){const v=rnd(V.filter(x=>W(x.t).length>=3)),w=W(v.t),o=V.filter(x=>x!==v&&W(x.t).length>=3);
+if(Math.random()<.5&&w.length>=4){const j=1+Math.floor(Math.random()*(w.length-2)),ws=[...new Set(o.flatMap(x=>W(x.t)).filter(z=>z!=w[j]))],op=sh([w[j],...sh(ws).slice(0,3)]);return{ty:'o',q:'Lengkapi kata yang hilang',ar:w.map((z,i)=>i==j?'_____':z).join(' '),o:op,a:op.indexOf(w[j]),top:SU[v.s].n}}
+const c=Math.ceil(w.length/2),rest=w.slice(c).join(' '),ds=[...new Set(o.map(x=>{const y=W(x.t);return y.slice(Math.ceil(y.length/2)).join(' ')}).filter(r=>r!=rest))],op=sh([rest,...sh(ds).slice(0,3)]);return{ty:'o',q:'Pilih kelanjutan ayat',ar:w.slice(0,c).join(' ')+' …',o:op,a:op.indexOf(rest),top:SU[v.s].n}}
+if(k=='tebak'){const v=rnd(V),lb=x=>SU[x.s].n+' : '+x.n,op=sh([v,...sh(V.filter(x=>x!==v)).slice(0,3)]).map(lb);return{ty:'o',q:'Ayat ini berasal dari…',ar:v.t,o:op,a:op.indexOf(lb(v)),top:SU[v.s].n}}
+if(k=='susun'){const v=rnd(V.filter(x=>W(x.t).length>=3&&W(x.t).length<=6));return{ty:'s',q:'Susun potongan menjadi ayat yang benar',ws:sh(W(v.t)),ans:v.t,top:SU[v.s].n}}
+const h=rnd(HK),op=sh([h.r,...sh(HP.filter(x=>x!=h.r)).slice(0,3)]);return{ty:'o',q:h.q,ar:h.t,o:op,a:op.indexOf(h.r),top:h.r}}
+function startQ(k){const n={tantang:12,susun:4}[k]||5;let l=[];if(k=='hukum')l=sh(HK).map(h=>{const op=sh([h.r,...sh(HP.filter(x=>x!=h.r)).slice(0,3)]);return{ty:'o',q:h.q,ar:h.t,o:op,a:op.indexOf(h.r),top:h.r}});else for(let i=0;i<n;i++)l.push(gen(k=='tantang'?rnd(['sambung','tebak','susun','hukum']):k=='ujian'?'sambung':k));
+Q={k,l,i:0,ok:0,no:0,st:0,best:0,t0:Date.now(),sel:null,seq:[],left:60,done:0,bad:[]}}
+const QN={sambung:'Sambung Ayat',tebak:'Tebak Ayat',susun:'Susun Ayat',hukum:'Tebak Hukum Bacaan',tantang:'Tantangan Waktu',ujian:'Ujian Sambung Ayat'};
+function quiz(){const q=Q.l[Q.i],tm=Q.k=='tantang',a=Q.sel!=null;let b='';
+if(q.ty=='o')b=q.o.map((x,i)=>`<button class="opt ${a&&i==q.a?'ok':a&&i==Q.sel?'no':''}" onclick="A('pick:${i}')">${x}</button>`).join('');
+else{const ch=Q.seq.map(i=>q.ws[i]);b=`<div class=mush style="min-height:70px"><div class=ar style="font-size:26px">${ch.length?Q.seq.map(i=>`<button class=ch style="font:inherit" onclick="A('un:${i}')" ${a?'disabled':''}>${q.ws[i]}</button>`).join(''):'<small>Ketuk potongan di bawah</small>'}</div></div><div class=ar style="font-size:26px">${q.ws.map((w,i)=>Q.seq.includes(i)?'':`<button class=ch style="font:inherit" onclick="A('ad:${i}')">${w}</button>`).join('')}</div>${a?`<div class="card" style="background:${Q.sel?'#d5efe1':'#f6d6d2'};color:#222;margin-top:8px"><b>${Q.sel?'Benar':'Kurang tepat'}</b><div class=ar style="font-size:24px">${q.ans}</div></div>`:B('Periksa','chk').replace('<button','<button '+(Q.seq.length==q.ws.length?'':'disabled'))}`}
+return `${hd(QN[Q.k])}<div class="row sp2"><small>Soal ${Q.i+1}/${Q.l.length}</small>${tm?`<span>${bd('⏱ '+Q.left+'d','y')} ${bd('Streak '+Q.st,'g')} ${bd('Benar '+Q.ok)}`:''}</span></div>${bar((Q.i+1)/Q.l.length)}<p><b>${q.q}</b></p>${q.ar?`<div class=mush><div class=ar>${q.ar}</div></div>`:''}${b}${a?B(Q.i+1>=Q.l.length?'Lihat hasil':'Lanjut','nx'):''}`}
+function fin(){Q.done=1;Q.dur=Math.round((Date.now()-Q.t0)/1000);const ex=Q.k=='ujian',pc=Q.ok/Q.l.length;
+if(ex){C.hist.unshift({t:'Ujian Sambung Ayat · Level 1',r:Math.round(pc*100)+'% · '+(pc>=.6?'Lulus':'Belum lulus'),d:dt()});if(pc>=.6&&!C.own.length)C.own.push({lv:0,d:dt(),no:'HF-'+new Date().getFullYear()+'-'+String(1000+Math.floor(Math.random()*9000))})}
+log(QN[Q.k]+': '+Q.ok+'/'+Q.l.length+' benar');S.scr='res'}
+function res(){const n=Q.l.length,pc=Math.round(Q.ok/n*100),ex=Q.k=='ujian',pass=ex&&pc>=60,tt=[...new Set(Q.bad.map(x=>x.top))];
+return `<div class=card style="text-align:center;margin-top:10px"><small>${QN[Q.k]}</small><div class=big>${Q.k=='tantang'?Q.ok*10+Q.best*2+' poin':pc+'%'}</div><p>${Q.ok} benar · ${Q.no} salah${Q.k=='tantang'?` · ${n-Q.ok-Q.no} tidak sempat`:''} · ${mm(Q.dur)}${Q.k=='tantang'?` · streak terbaik ${Q.best}`:''}</p>${ex?bd(pass?'Lulus':'Belum lulus',pass?'g':'r'):''}</div>
+<h4>Materi yang perlu dipelajari</h4>${tt.length?`<div class=card>${tt.map(x=>bd(x,'y')).join(' ')}</div>`:'<div class=card><p class=mu>Tidak ada. Bagus!</p></div>'}
+${Q.bad.length?`<h4>Pelajari kesalahan</h4>`+Q.bad.map(x=>`<div class=card><div class=ar style="font-size:22px;line-height:1.8">${x.ar||x.ans}</div><small>${x.q}</small><p>Jawaban benar: <b class=ar style="font-size:20px">${x.ty=='o'?x.o[x.a]:x.ans}</b></p></div>`).join(''):''}
+${pass?B('Lihat sertifikat','cert','au'):''}${B('Coba lagi','retry')}${B(ex?'Kembali ke Sertifikasi':'Kembali ke LCC','after','o')}${Q.bad.some(x=>HP.includes(x.top))?B('Pelajari tajwid','go:tajwid','o'):''}`}
+function qr(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;let r='';for(let y=0;y<21;y++)for(let x=0;x<21;x++){let on;if((x<7||x>13)&&(y<7||y>13)&&!(x>13&&y>13)){const a=x<7?x:x-14,b=y<7?y:y-14;on=a==0||a==6||b==0||b==6||(a>1&&a<5&&b>1&&b<5)}else{h=(h*1103515245+12345)>>>0;on=(h>>16)&1}if(on)r+=`<rect x=${x} y=${y} width=1 height=1 />`}return `<svg viewBox="0 0 21 21" width=96 height=96 fill="#0a3d31">${r}</svg>`}
+function cert(){const c=C.own[S.ec]||C.own[0];return hd('Sertifikat')+`<div class=cert><small>HifzFlow · Sertifikat kompetensi internal</small><h2 style="margin:10px 0">Sertifikat Kompetensi</h2><p>diberikan kepada</p><h3 style="font-size:24px">${G.name}</h3><p>atas capaian <b>${L[c.lv].n}</b></p><p>Tanggal terbit: ${c.d}</p><p>Nomor: ${c.no} <small>(contoh)</small></p><div style="display:flex;justify-content:center;margin:10px 0">${qr(c.no)}</div><small>QR contoh, belum terhubung ke layanan verifikasi</small></div><p class=mu style="font-size:13px">Sertifikat ini adalah sertifikasi kompetensi internal HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an.</p>${B('Bagikan (preview)','prev','o')}`}
+function sert(){const l=L[S.sl],dn=l.rq.filter(x=>x[1]()).length;
+return hd('Sertifikasi')+`<div class=card style="border-color:var(--au)"><b>Sertifikasi kompetensi internal</b><p class=mu>Program penilaian kemampuan hafalan di HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum.</p></div>
+<h4>Jenjang</h4>${L.map((x,i)=>`<div class=card onclick="A('sl:${i}')" style="cursor:pointer;${S.sl==i?'border-color:var(--g)':''}"><div class="row sp2"><b>${x.n}</b>${x.lock?bd('Segera'):bd(C.own.some(c=>c.lv==i)?'Diraih':'Terbuka',C.own.some(c=>c.lv==i)?'g':'y')}</div><p class=mu>${x.d}</p></div>`).join('')}
+${l.lock?'':`<h4>Persyaratan & progres</h4><div class=card>${bar(dn/l.rq.length)}${l.rq.map(x=>`<p>${x[1]()?'✅':'⬜'} ${x[0]}</p>`).join('')}</div>${B('Ikut ujian','go:sertex')}`}
+<h4>Riwayat ujian</h4>${C.hist.length?C.hist.map(x=>`<div class=card><b>${x.t}</b><p class=mu>${x.r} · ${x.d}</p></div>`).join(''):'<div class="card emp">Belum ada ujian. Mulai dari Level 1.</div>'}
+<h4>Sertifikat saya</h4>${C.own.length?C.own.map((x,i)=>`<div class="card row" onclick="A('cert:${i}')" style="cursor:pointer"><span style="font-size:26px">🎓</span><div style="flex:1"><b>${L[x.lv].n}</b><p class=mu>${x.no} · ${x.d}</p></div>›</div>`).join(''):'<div class="card emp">Belum ada sertifikat.</div>'}`}
+function sertex(){return hd('Ujian Level 1')+`<p class=mu>Pilih jenis ujian. Lulus ujian sambung ayat (≥60%) menerbitkan sertifikat contoh.</p>${[['Ujian sambung ayat','5 soal sambung ayat. Sudah berfungsi.','q:ujian'],['Ujian hafalan','Setor hafalan ke penguji. Preview.','pv'],['Ujian kelancaran','Penilaian kelancaran bacaan. Preview.','pv'],['Penilaian penguji manusia','Penguji menilai rekaman Anda. Preview.','pv']].map(x=>`<div class="card row" onclick="A('${x[2]}')" style="cursor:pointer"><div style="flex:1"><b>${x[0]}</b><p class=mu>${x[1]}</p></div>›</div>`).join('')}`}
+
+
+
+const mkH=o=>Object.assign({st:'pick',s:0,f:1,t:3,rep:5,cu:0,focus:0,c:0,hide:0,peek:0,rec:0,rt:0,mk:{},ab:0},o);
+const mkQ=o=>Object.assign({k:'sambung',l:[],i:0,ok:0,no:0,st:0,best:0,t0:0,sel:null,seq:[],left:60,done:0,bad:[],dur:0},o);
+const qS={ty:'o',q:'Pilih kelanjutan ayat',ar:'الْحَمْدُ لِلَّهِ …',o:['رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','اللَّهُ الصَّمَدُ'],a:0,top:'Al-Fatihah'};
+const qU={ty:'s',q:'Susun potongan menjadi ayat yang benar',ws:['وَلَمْ','لَمْ','يُولَدْ','يَلِدْ'],ans:'لَمْ يَلِدْ وَلَمْ يُولَدْ',top:'Al-Ikhlas'};
+C.own=[{lv:0,d:'17 November 2026',no:'HF-2026-4821'}];C.hist=[{t:'Ujian Sambung Ayat · Level 1',r:'80% · Lulus',d:'17 November 2026'}];
+const tab=(t)=>()=>{S.tab=t;S.scr='';S.m=null};
+const scr=(s,f)=>()=>{S.scr=s;S.m=null;f&&f()};
+const mod=(m)=>{S.m=m};
+const askM={t:'Akhiri sesi hafalan?',b:'Sesi dihentikan dan progres sesi ini tidak disimpan. Focus Mode akan dimatikan dan pengaturan fokus dipulihkan (simulasi).',bt:[['Lanjutkan sesi','mclose','o'],['Akhiri sesi','endH','rd']]};
+const SECS=[
+['Navigasi utama (tab bar)',[
+ ['01 · Beranda',tab('home')],['02 · Belajar',tab('learn')],['03 · LCC',tab('lcc')],['04 · Profil',tab('prof')]]],
+['Tilawah',[
+ ['05 · Tilawah · Bebas',scr('tilawah',()=>{T={...T,m:'bebas',s:0,f:1,t:7,p:3}})],
+ ['06 · Tilawah · Waktu',scr('tilawah',()=>{T={...T,m:'waktu',min:15,left:612,el:288,run:1}})],
+ ['07 · Tilawah · Target',scr('tilawah',()=>{T={...T,m:'target',u:'Ayat',n:5,d:2}})]]],
+["Muraja'ah",[
+ ["08 · Muraja'ah · Daftar",scr('muraja',()=>{F='all'})],
+ ["09 · Muraja'ah · Filter 'Perlu diulang'",scr('muraja',()=>{F='ulang'})],
+ ["10 · Muraja'ah · Detail ayat (bottom sheet)",scr('muraja',()=>{F='all';mod({t:'Al-Fatihah : 2',h:'<div class=ar>'+SU[0].a[1]+'</div>',bt:[['Tandai lancar','x'],['Perlu diulang','x','o'],['Tutup','x','o']]})})]]],
+['Hafalan',[
+ ['11 · Hafalan · 1 Pilih ayat',scr('hafal',()=>{H=mkH({})})],
+ ['12 · Hafalan · 2 Atur pengulangan',scr('hafal',()=>{H=mkH({st:'set',focus:1})})],
+ ['13 · Hafalan · 3 Ulangi',scr('hafal',()=>{H=mkH({st:'rep',c:3,focus:1})})],
+ ['14 · Hafalan · 4 Uji (ayat tampil)',scr('hafal',()=>{H=mkH({st:'test',c:5})})],
+ ['15 · Hafalan · 4 Uji (ayat disembunyikan)',scr('hafal',()=>{H=mkH({st:'test',c:5,hide:1})})],
+ ['16 · Hafalan · 5 Rekam',scr('hafal',()=>{H=mkH({st:'rec',rec:1,rt:23})})],
+ ['17 · Hafalan · 6 Evaluasi',scr('hafal',()=>{H=mkH({st:'eval',mk:{1:'g',2:'y',3:'r'}})})],
+ ['18 · Hafalan · Sesi selesai',scr('hafal',()=>{H=mkH({st:'done',focus:1})})],
+ ['19 · Hafalan · Dialog akhiri sesi',scr('hafal',()=>{H=mkH({st:'rep',c:3,focus:1});mod(askM)})]]],
+['Tajwid',[
+ ['20 · Belajar Tajwid',scr('tajwid',()=>{S.tj=0})]]],
+['LCC / Kuis',[
+ ['21 · Kuis · Sambung Ayat',scr('quiz',()=>{Q=mkQ({k:'sambung',l:Array(5).fill(qS)})})],
+ ['22 · Kuis · Jawaban benar',scr('quiz',()=>{Q=mkQ({k:'sambung',l:Array(5).fill(qS),ok:1,st:1,sel:0})})],
+ ['23 · Kuis · Jawaban salah',scr('quiz',()=>{Q=mkQ({k:'sambung',l:Array(5).fill(qS),no:1,sel:2})})],
+ ['24 · Kuis · Susun Ayat',scr('quiz',()=>{Q=mkQ({k:'susun',l:Array(4).fill(qU),seq:[1,3]})})],
+ ['25 · Kuis · Tantangan Waktu',scr('quiz',()=>{Q=mkQ({k:'tantang',l:Array(12).fill(qS),i:4,ok:3,no:1,st:2,best:3,left:42})})],
+ ['26 · Hasil kuis (lulus ujian)',scr('res',()=>{Q=mkQ({k:'ujian',l:Array(5).fill(qS),ok:4,no:1,dur:95,done:1,bad:[qS]})})],
+ ['27 · Hasil kuis (tantangan waktu)',scr('res',()=>{Q=mkQ({k:'tantang',l:Array(12).fill(qS),ok:8,no:2,best:5,dur:60,done:1,bad:[qS]})})]]],
+['Sertifikasi',[
+ ['28 · Sertifikasi',scr('sert',()=>{S.sl=0})],
+ ['29 · Ujian Level 1',scr('sertex')],
+ ['30 · Sertifikat',scr('cert',()=>{S.ec=0})]]],
+['Varian tema gelap',[
+ ['31 · Beranda (gelap)',tab('home'),1],['32 · Profil (gelap)',tab('prof'),1],['33 · Hafalan · Ulangi (gelap)',scr('hafal',()=>{H=mkH({st:'rep',c:3,focus:1})}),1]]]
+];
+function pageHTML(){
+ const map={'':()=>({home,learn,lcc,prof})[S.tab](),tilawah,muraja,hafal,tajwid,quiz,res,sert,sertex,cert};
+ return map[S.scr]()}
+function shell(pg,dark){
+ const m=S.m?`<div class=ov><div class=sh><h3>${S.m.t}</h3>${S.m.b?`<p>${S.m.b}</p>`:''}${S.m.h||''}${(S.m.bt||[['Tutup','x']]).map(x=>B(x[0],x[1],x[2]||'')).join('')}</div></div>`:'';
+ const nav=S.scr?'':`<nav>${[['home','🏠','Beranda'],['learn','📖','Belajar'],['lcc','🏆','LCC'],['prof','👤','Profil']].map(x=>`<button class="${S.tab==x[0]?'on':''}"><i>${x[1]}</i>${x[2]}</button>`).join('')}</nav>`;
+ return `<div class="app${dark?' dark':''}"><div class=v>${pg}</div>${nav}${m}</div>`}
+let out='';
+SECS.forEach(([name,list])=>{
+ out+=`<section class=sec><h2>${name}</h2><div class=grid4>`;
+ list.forEach(([title,setup,dark])=>{
+  S={tab:'home',scr:'',st:[],m:null,ts:'',tj:-1,sl:0,ec:0};
+  setup();
+  let pg=pageHTML(),k=0;
+  pg=pg.replace(/<i style="animation-delay:[^"]*">/g,()=>`<i style="height:${Math.round(14+Math.abs(Math.sin(k++*0.75))*46)}px">`);
+  out+=`<figure class=fr><figcaption>${title}</figcaption>${shell(pg,dark)}</figure>`});
+ out+='</div></section>'});
+document.getElementById('gallery').innerHTML=out;
+
+</script></body></html>
