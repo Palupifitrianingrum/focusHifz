@@ -80,12 +80,13 @@ class _TilawahPageState extends State<TilawahPage> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Surah', style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          Text('Surah', style: sans(15, weight: FontWeight.w700)),
+          const SizedBox(height: 10),
           Wrap(children: [
             for (var i = 0; i < surahs.length; i++)
               HChip(label: surahs[i].n, on: s == i, onTap: () => _pickSurah(i)),
           ]),
+          const SizedBox(height: 4),
           SpinRow(
               label: 'Ayat awal',
               value: '$f',
@@ -100,22 +101,34 @@ class _TilawahPageState extends State<TilawahPage> {
       ),
       Mushaf(child: AyatText(s: s, from: pos, to: pos)),
       Row(children: [
-        HChip(
-            label: '‹ Sebelumnya',
-            on: false,
-            onTap: () => setState(() => pos = clampI(pos - 1, f, t))),
-        Expanded(child: Muted('Ayat $pos · $f–$t', align: TextAlign.center, size: 13)),
-        HChip(
-            label: 'Berikutnya ›',
-            on: false,
-            onTap: () => setState(() => pos = clampI(pos + 1, f, t))),
+        Expanded(
+          child: HButton(
+              label: 'Sebelumnya',
+              kind: BK.outline,
+              icon: Icons.chevron_left_rounded,
+              onPressed: () => setState(() => pos = clampI(pos - 1, f, t))),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: HButton(
+              label: 'Berikutnya',
+              kind: BK.outline,
+              icon: Icons.chevron_right_rounded,
+              onPressed: () => setState(() => pos = clampI(pos + 1, f, t))),
+        ),
+      ]),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(child: Muted('Ayat $pos · rentang $f–$t', size: 13)),
+        Text('${(prog * 100).round()}%', style: sans(13, weight: FontWeight.w700)),
       ]),
       HBar(prog),
-      Muted('Progres bacaan ${(prog * 100).round()}%', size: 13),
     ]);
   }
 
   Widget _waktu() {
+    final pl = Pal.of(context);
+    final status = run ? 'Sedang berjalan' : (el > 0 ? 'Dijeda' : 'Siap dimulai');
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Wrap(alignment: WrapAlignment.center, children: [
         for (final x in [10, 15, 30, 60])
@@ -134,15 +147,25 @@ class _TilawahPageState extends State<TilawahPage> {
       ]),
       Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Ring(progress: left / (minutes * 60), label: mm(left), size: 190),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Semantics(
+            label: 'Sisa waktu ${mm(left)}',
+            child: Ring(progress: left / (minutes * 60), label: mm(left), size: 200),
+          ),
         ),
       ),
-      Muted(
-          '${run ? 'Sedang berjalan' : (el > 0 ? 'Dijeda' : 'Siap dimulai')} · terbaca ${mm(el)}',
-          align: TextAlign.center),
+      Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration:
+              BoxDecoration(color: pl.card2, borderRadius: BorderRadius.circular(Rad.control)),
+          child: Text('$status · terbaca ${mm(el)}', style: sans(13.5, weight: FontWeight.w600)),
+        ),
+      ),
+      const SizedBox(height: 8),
       HButton(
           label: run ? 'Jeda' : (el > 0 ? 'Lanjutkan' : 'Mulai'),
+          icon: run ? Icons.pause_rounded : Icons.play_arrow_rounded,
           onPressed: () => setState(() => run = !run)),
       HButton(label: 'Akhiri sesi', kind: BK.outline, onPressed: _end),
     ]);
@@ -153,8 +176,8 @@ class _TilawahPageState extends State<TilawahPage> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Jenis target', style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          Text('Jenis target', style: sans(15, weight: FontWeight.w700)),
+          const SizedBox(height: 10),
           Wrap(children: [
             for (final x in ['Ayat', 'Halaman', 'Surah'])
               HChip(
@@ -175,21 +198,20 @@ class _TilawahPageState extends State<TilawahPage> {
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Expanded(
-                child: Text('Progres target', style: TextStyle(fontWeight: FontWeight.w700))),
-            Text('$d/$n $unit'),
+            Expanded(child: Text('Progres target', style: sans(15, weight: FontWeight.w700))),
+            Text('$d/$n $unit', style: sans(14, weight: FontWeight.w600)),
           ]),
           HBar(d / n),
         ]),
       ),
       HButton(
           label: 'Tandai 1 $unit selesai',
+          icon: Icons.check_rounded,
           onPressed: () {
             setState(() => d++);
             if (d >= n) {
               app.addLog('Tilawah target $n $unit');
-              showHSheet(context,
-                  title: 'Target tercapai', body: '$n $unit selesai dibaca.');
+              showHSheet(context, title: 'Target tercapai', body: '$n $unit selesai dibaca.');
               setState(() => d = 0);
             }
           }),
@@ -201,21 +223,16 @@ class _TilawahPageState extends State<TilawahPage> {
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
     const names = ['bebas', 'waktu', 'target'];
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            const PageHeader('Tilawah'),
-            Seg(
-              labels: const ['Bebas', 'Waktu', 'Target'],
-              index: names.indexOf(m),
-              onChanged: (i) => setState(() => m = names[i]),
-            ),
-            if (m == 'bebas') _bebas(pl) else if (m == 'waktu') _waktu() else _target(),
-          ],
+    return PageScaffold(
+      children: [
+        const PageHeader('Tilawah'),
+        Seg(
+          labels: const ['Bebas', 'Waktu', 'Target'],
+          index: names.indexOf(m),
+          onChanged: (i) => setState(() => m = names[i]),
         ),
-      ),
+        if (m == 'bebas') _bebas(pl) else if (m == 'waktu') _waktu() else _target(),
+      ],
     );
   }
 }
@@ -250,37 +267,50 @@ class _MurajaPageState extends State<MurajaPage> {
               ['belajar', 'Sedang dipelajari'],
               ['lancar', 'Sudah lancar'],
             ];
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+            return PageList(
               children: [
-                const PageHeader("Muraja'ah"),
+                PageHeader("Muraja'ah", sub: '${app.pending} ayat perlu diulang'),
                 Wrap(children: [
                   for (final x in filters)
                     HChip(label: x[1], on: filter == x[0], onTap: () => setState(() => filter = x[0])),
                 ]),
+                const SizedBox(height: 4),
                 if (list.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(18),
-                    child: Muted('Tidak ada ayat di kategori ini.', align: TextAlign.center),
+                  const EmptyState(
+                    icon: Icons.inbox_outlined,
+                    title: 'Tidak ada ayat di kategori ini',
+                    body: 'Ayat dari sesi hafalan akan muncul di sini.',
                   ),
                 for (final x in list)
                   HCard(
                     onTap: () => _open(context, x),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [
-                        Expanded(
-                            child: Text('${surahs[x.s].n} : ${x.n}',
-                                style: const TextStyle(fontWeight: FontWeight.w700))),
-                        Bdg(nm[x.st]![0], kind: nm[x.st]![1]),
-                      ]),
-                      Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text(surahs[x.s].a[x.n - 1],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: arabic(22, color: pl.text, height: 1.7)),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      RubBadge(
+                        size: 46,
+                        child: Text('${x.n}', style: serif(15, color: pl.green)),
                       ),
-                      Muted('Jadwal: ${x.due} · salah ${x.err}x', size: 13),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('${surahs[x.s].n} : ${x.n}',
+                              style: sans(15, weight: FontWeight.w700)),
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(surahs[x.s].a[x.n - 1],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: arabic(22, color: pl.text, height: 1.7)),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                            Bdg(nm[x.st]![0], kind: nm[x.st]![1]),
+                            Muted('Jadwal: ${x.due} · salah ${x.err}x', size: 12.5),
+                          ]),
+                        ]),
+                      ),
                     ]),
                   ),
               ],
@@ -331,34 +361,37 @@ class _TajwidPageState extends State<TajwidPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            const PageHeader('Belajar tajwid'),
-            const Muted('Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.'),
-            const SizedBox(height: 10),
-            for (var i = 0; i < tajwid.length; i++)
-              HCard(
-                onTap: () => setState(() => open = open == i ? -1 : i),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Expanded(
-                        child: Text(tajwid[i][0],
-                            style: const TextStyle(fontWeight: FontWeight.w700))),
-                    Text(open == i ? '−' : '+', style: const TextStyle(fontSize: 18)),
-                  ]),
-                  if (open == i)
-                    Padding(padding: const EdgeInsets.only(top: 6), child: Text(tajwid[i][1])),
+    final pl = Pal.of(context);
+    return PageScaffold(
+      children: [
+        const PageHeader('Belajar tajwid'),
+        const Muted('Ringkasan dasar. Verifikasi dengan guru sebelum dijadikan rujukan.'),
+        const SizedBox(height: 14),
+        for (var i = 0; i < tajwid.length; i++)
+          Semantics(
+            expanded: open == i,
+            child: HCard(
+              onTap: () => setState(() => open = open == i ? -1 : i),
+              border: open == i ? pl.green : null,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Expanded(child: Text(tajwid[i][0], style: sans(15, weight: FontWeight.w700))),
+                  Icon(open == i ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                      color: pl.muted),
                 ]),
-              ),
-            HButton(
-                label: 'Latihan tebak hukum bacaan',
-                onPressed: () => pushPage(context, const QuizPage(kind: 'hukum'))),
-          ],
-        ),
-      ),
+                if (open == i)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(tajwid[i][1], style: sans(14, height: 1.55)),
+                  ),
+              ]),
+            ),
+          ),
+        HButton(
+            label: 'Latihan tebak hukum bacaan',
+            icon: Icons.spellcheck_rounded,
+            onPressed: () => pushPage(context, const QuizPage(kind: 'hukum'))),
+      ],
     );
   }
 }

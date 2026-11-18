@@ -340,18 +340,7 @@ class _HafalPageState extends State<HafalPage> {
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _onBack();
       },
-      child: Scaffold(
-        body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-            children: [
-              _banner(),
-              _header(),
-              _body(),
-            ],
-          ),
-        ),
-      ),
+      child: PageScaffold(children: [_banner(), _header(), _body()]),
     );
   }
 
@@ -361,29 +350,36 @@ class _HafalPageState extends State<HafalPage> {
     }
     final pl = Pal.of(context);
     String text;
+    IconData ic = Icons.lock_outline_rounded;
     if (!locked) {
-      text = timeUp ? '🔓 Waktu fokus selesai · kunci dibuka' : '🔓 Focus Mode selesai';
+      text = timeUp ? 'Waktu fokus selesai · kunci dibuka' : 'Focus Mode selesai';
+      ic = Icons.lock_open_rounded;
     } else if (focus == FocusKind.waktu) {
-      text = '🔒 Focus Mode · ${mm(left)}';
+      text = 'Focus Mode · ${mm(left)}';
     } else {
-      text = '🔒 Focus Mode · terbuka setelah lulus uji hafalan';
+      text = 'Focus Mode · terbuka setelah lulus uji hafalan';
     }
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: pl.green2, borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(color: pl.green2, borderRadius: BorderRadius.circular(14)),
       child: Row(children: [
-        Expanded(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 13))),
+        Icon(ic, size: 20, color: pl.onHero),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(text, style: sans(13.5, weight: FontWeight.w600, color: pl.onHero)),
+        ),
         if (locked && modeUji)
           TextButton(
             onPressed: _abort,
             style: TextButton.styleFrom(
-              backgroundColor: Colors.white24,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              minimumSize: const Size(0, 32),
+              backgroundColor: Colors.white.withValues(alpha: .16),
+              foregroundColor: pl.onHero,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              minimumSize: const Size(0, 44),
+              textStyle: sans(12, weight: FontWeight.w700),
             ),
-            child: const Text('Keluar (mode uji)', style: TextStyle(fontSize: 12)),
+            child: const Text('Keluar (mode uji)'),
           ),
       ]),
     );
@@ -394,13 +390,18 @@ class _HafalPageState extends State<HafalPage> {
       return PageHeader('Hafalan', onBack: _onBack);
     }
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(children: [
         if (!locked) ...[
-          HIconBtn(icon: Icons.close, onTap: _ask),
-          const SizedBox(width: 8),
+          HIconBtn(icon: Icons.close_rounded, label: 'Akhiri sesi', onTap: _ask),
+          const SizedBox(width: 12),
         ],
-        Expanded(child: Text('${surahs[s].n} : $from–$to', style: serif(19))),
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text('${surahs[s].n} : $from–$to', style: serif(22)),
+          ),
+        ),
       ]),
     );
   }
@@ -427,38 +428,46 @@ class _HafalPageState extends State<HafalPage> {
   Widget _dots(int ix) {
     final pl = Pal.of(context);
     const labels = ['Pilih', 'Ulangi', 'Uji', 'Evaluasi'];
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(children: [
-        for (var i = 0; i < labels.length; i++)
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: i < labels.length - 1 ? 4 : 0),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: i <= ix ? pl.green : pl.line,
-                    borderRadius: BorderRadius.circular(5),
+    return Semantics(
+      label: 'Tahap ${ix + 1} dari ${labels.length}: ${labels[ix]}',
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(children: [
+          for (var i = 0; i < labels.length; i++)
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: i <= ix ? pl.green : pl.line,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(labels[i], style: TextStyle(fontSize: 11, color: pl.muted)),
-              ]),
+                  const SizedBox(height: 5),
+                  Text(labels[i],
+                      style: sans(11.5,
+                          weight: i == ix ? FontWeight.w700 : FontWeight.w500,
+                          color: i == ix ? pl.text : pl.muted)),
+                ]),
+              ),
             ),
-          ),
-      ]),
+        ]),
+      ),
     );
   }
 
   // ---------- Pilih ----------
   Widget _buildPick() {
+    final pl = Pal.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _dots(0),
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Pilih surah', style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          Text('Pilih surah', style: sans(15, weight: FontWeight.w700)),
+          const SizedBox(height: 10),
           Wrap(children: [
             for (var i = 0; i < surahs.length; i++)
               HChip(
@@ -493,7 +502,16 @@ class _HafalPageState extends State<HafalPage> {
             onMinus: () => setState(() => to = clampI(to - 1, from, total)),
             onPlus: () => setState(() => to = clampI(to + 1, from, total)),
           ),
-          Muted('${surahs[s].n} · $total ayat · hafalan ayat $from–$to ($count ayat)'),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration:
+                BoxDecoration(color: pl.card2, borderRadius: BorderRadius.circular(Rad.control)),
+            child: Text(
+                '${surahs[s].n} · $total ayat · hafalan ayat $from–$to ($count ayat)',
+                style: sans(13.5, weight: FontWeight.w600)),
+          ),
         ]),
       ),
       HButton(label: 'Lanjut: atur pengulangan', onPressed: () => setState(() => step = HStep.set)),
@@ -507,9 +525,8 @@ class _HafalPageState extends State<HafalPage> {
       _dots(0),
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Jumlah pengulangan per ayat',
-              style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          Text('Jumlah pengulangan per ayat', style: sans(15, weight: FontWeight.w700)),
+          const SizedBox(height: 10),
           Wrap(children: [
             HChip(
                 label: '5x',
@@ -534,7 +551,7 @@ class _HafalPageState extends State<HafalPage> {
               onMinus: () => setState(() => rep = clampI(rep - 1, 1, 100)),
               onPlus: () => setState(() => rep = clampI(rep + 1, 1, 100)),
             ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Muted(
               'Setiap pengulangan, bacakan ayat ke mikrofon (ayat tetap tampil). Tombol lanjut baru aktif setelah bacaanmu terdeteksi.',
               size: 13),
@@ -542,17 +559,21 @@ class _HafalPageState extends State<HafalPage> {
       ),
       HCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Focus Mode', style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
+          Row(children: [
+            Icon(Icons.lock_outline_rounded, size: 20, color: pl.green),
+            const SizedBox(width: 8),
+            Text('Focus Mode', style: sans(15, weight: FontWeight.w700)),
+          ]),
+          const SizedBox(height: 4),
           const Muted('Kunci layar dan blokir notifikasi selama sesi ini saja.', size: 13),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Seg(
             labels: const ['Mati', 'Target waktu', 'Target ayat'],
             index: focus.index,
             onChanged: (i) => setState(() => focus = FocusKind.values[i]),
           ),
           if (focus == FocusKind.waktu) ...[
-            Text('Durasi fokus: $focusMin menit', style: const TextStyle(fontSize: 16)),
+            Text('Durasi fokus: $focusMin menit', style: sans(15, weight: FontWeight.w600)),
             Slider(
               value: focusMin.toDouble(),
               min: 1,
@@ -569,23 +590,32 @@ class _HafalPageState extends State<HafalPage> {
                 'Kunci baru terbuka setelah kamu lulus uji hafalan: ayat disembunyikan dan kamu melafalkannya dari ingatan.',
                 size: 13),
           if (focus != FocusKind.off) ...[
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration:
-                  BoxDecoration(color: pl.line, borderRadius: BorderRadius.circular(10)),
-              child: const Text(
+            const SizedBox(height: 12),
+            const StatusNote(
+              kind: SK.info,
+              margin: EdgeInsets.zero,
+              title: 'Pin layar Android',
+              body:
                   'Android akan menampilkan dialog "pin layar". Pilih Mulai / Got it. Izin Jangan Ganggu (opsional) dipakai untuk menahan notifikasi.',
-                  style: TextStyle(fontSize: 13)),
             ),
-            TextButton(
+            const SizedBox(height: 4),
+            TextButton.icon(
               onPressed: () => native('dndSettings'),
-              child: const Text('Izinkan mode Jangan Ganggu (opsional)'),
+              style: TextButton.styleFrom(
+                foregroundColor: pl.green,
+                minimumSize: const Size(0, 44),
+                textStyle: sans(13.5, weight: FontWeight.w700),
+              ),
+              icon: const Icon(Icons.do_not_disturb_on_outlined, size: 20),
+              label: const Text('Izinkan mode Jangan Ganggu (opsional)'),
             ),
           ],
         ]),
       ),
-      HButton(label: busy ? 'Menyiapkan…' : 'Mulai sesi', onPressed: busy ? null : _start),
+      HButton(
+          label: busy ? 'Menyiapkan…' : 'Mulai sesi',
+          icon: busy ? null : Icons.play_arrow_rounded,
+          onPressed: busy ? null : _start),
     ]);
   }
 
@@ -610,7 +640,11 @@ class _HafalPageState extends State<HafalPage> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       HCard(
         child: Column(children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          Semantics(
+            liveRegion: true,
+            child: Text(title, style: sans(15, weight: FontWeight.w700)),
+          ),
+          const SizedBox(height: 4),
           Waveform(active: mic == MicState.listening, level: stt.level),
           Muted(hint, size: 13, align: TextAlign.center),
         ]),
@@ -619,12 +653,7 @@ class _HafalPageState extends State<HafalPage> {
         valueListenable: stt.error,
         builder: (context, e, _) => e == null
             ? const SizedBox.shrink()
-            : HCard(
-                color: kBadBg,
-                border: pl.red,
-                child: Text(e,
-                    style: const TextStyle(color: kBadFg, fontWeight: FontWeight.w600)),
-              ),
+            : StatusNote(kind: SK.bad, title: e),
       ),
       if (mic == MicState.listening || mic == MicState.checking)
         HCard(
@@ -636,6 +665,7 @@ class _HafalPageState extends State<HafalPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Muted('Teks yang terdengar', size: 12),
+                  const SizedBox(height: 4),
                   Directionality(
                     textDirection: TextDirection.rtl,
                     child: SizedBox(
@@ -643,7 +673,7 @@ class _HafalPageState extends State<HafalPage> {
                       child: Text(
                         txt.isEmpty ? 'Belum ada suara terdeteksi…' : txt,
                         style: txt.isEmpty
-                            ? TextStyle(fontSize: 13, color: pl.muted)
+                            ? sans(13, color: pl.muted)
                             : arabic(22, color: pl.text, height: 1.9),
                       ),
                     ),
@@ -658,6 +688,7 @@ class _HafalPageState extends State<HafalPage> {
 
   // ---------- Ulangi ----------
   Widget _buildRep() {
+    final pl = Pal.of(context);
     final n = from + ai;
     final r = repRes;
     final result = mic == MicState.result;
@@ -677,10 +708,15 @@ class _HafalPageState extends State<HafalPage> {
         child: SizedBox(
           width: double.infinity,
           child: Column(children: [
-            Text.rich(TextSpan(children: [
-              TextSpan(text: '$c', style: serif(46)),
-              TextSpan(text: ' / $rep', style: serif(20)),
-            ])),
+            Semantics(
+              label: 'Pengulangan $c dari $rep',
+              child: Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: '$c', style: serif(46)),
+                  TextSpan(text: ' / $rep', style: serif(20, color: pl.muted)),
+                ]),
+              ),
+            ),
             const Muted('pengulangan', size: 13),
             HBar(c / rep),
           ]),
@@ -689,12 +725,16 @@ class _HafalPageState extends State<HafalPage> {
       _micPanel('Baca ayat di atas dengan suara jelas, lalu tekan "Selesai membaca".'),
       if (result) _repFeedback(r),
       if (mic == MicState.idle)
-        HButton(label: '🎙️ Mulai baca', onPressed: _micStart),
+        HButton(label: 'Mulai baca', icon: Icons.mic_none_rounded, onPressed: _micStart),
       if (mic == MicState.listening)
-        HButton(label: 'Selesai membaca', kind: BK.gold, onPressed: _repStop),
+        HButton(
+            label: 'Selesai membaca',
+            kind: BK.gold,
+            icon: Icons.stop_rounded,
+            onPressed: _repStop),
       if (mic == MicState.checking) const HButton(label: 'Memeriksa…'),
       if (result && !repPass) ...[
-        HButton(label: 'Coba baca lagi', onPressed: _retry),
+        HButton(label: 'Coba baca lagi', icon: Icons.replay_rounded, onPressed: _retry),
         if (fails >= kMaxGagal)
           HButton(label: 'Lewati tanpa penilaian', kind: BK.outline, onPressed: _skip),
       ],
@@ -707,12 +747,9 @@ class _HafalPageState extends State<HafalPage> {
   }
 
   Widget _repFeedback(CheckResult? r) {
+    final pl = Pal.of(context);
     if (skipped || r == null) {
-      return const HCard(
-        color: kWarnBg,
-        child: Text('Dilewati tanpa penilaian.',
-            style: TextStyle(color: kWarnFg, fontWeight: FontWeight.w600)),
-      );
+      return const StatusNote(kind: SK.warn, title: 'Dilewati tanpa penilaian.');
     }
     final n = from + ai;
     final a = r.ays[n];
@@ -720,12 +757,24 @@ class _HafalPageState extends State<HafalPage> {
     return HCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Ring(progress: r.acc, label: '${(r.acc * 100).round()}%', size: 84),
-          const SizedBox(width: 12),
+          Ring(
+              progress: r.acc,
+              label: '${(r.acc * 100).round()}%',
+              size: 88,
+              color: repPass ? pl.ok : pl.red),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(repPass ? 'Bacaan diterima ✓' : 'Belum tepat',
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              Row(children: [
+                Icon(repPass ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                    size: 20, color: repPass ? pl.ok : pl.red),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(repPass ? 'Bacaan diterima' : 'Belum tepat',
+                      style: sans(15, weight: FontWeight.w700)),
+                ),
+              ]),
+              const SizedBox(height: 2),
               Muted(
                   repPass
                       ? 'Kecocokan dari ${r.total} kata'
@@ -733,7 +782,7 @@ class _HafalPageState extends State<HafalPage> {
                           ? 'Belum ada suara terdeteksi. Coba lagi.'
                           : 'Minimal ${(kAkurasiUlang * 100).round()}% agar bisa lanjut.'),
                   size: 13),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Wrap(spacing: 6, runSpacing: 6, children: [
                 Bdg('${r.cnt['ok']} benar', kind: 'g'),
                 Bdg('${r.cnt['bad']} salah', kind: 'r'),
@@ -742,7 +791,7 @@ class _HafalPageState extends State<HafalPage> {
             ]),
           ),
         ]),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         _WordChips(ws),
         _ErrLines(ws),
       ]),
@@ -754,18 +803,25 @@ class _HafalPageState extends State<HafalPage> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _dots(2),
       Mushaf(
-        child: ImageFiltered(
-          imageFilter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
-          child: AyatText(s: s, from: from, to: to),
+        // Teks sengaja disembunyikan dari mata dan dari pembaca layar agar uji tetap jujur.
+        child: ExcludeSemantics(
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+            child: AyatText(s: s, from: from, to: to),
+          ),
         ),
       ),
-      Muted('Teks disembunyikan. Lafalkan ayat $from–$to dari ingatan.',
-          align: TextAlign.center),
-      const SizedBox(height: 8),
+      Muted('Teks disembunyikan. Lafalkan ayat $from–$to dari ingatan.', align: TextAlign.center),
+      const SizedBox(height: 12),
       _micPanel('Lafalkan seluruh ayat tanpa melihat teks, lalu tekan "Selesai & cek bacaan".'),
-      if (mic == MicState.idle) HButton(label: '🎙️ Mulai uji (rekam)', onPressed: _testStart),
+      if (mic == MicState.idle)
+        HButton(label: 'Mulai uji (rekam)', icon: Icons.mic_none_rounded, onPressed: _testStart),
       if (mic == MicState.listening)
-        HButton(label: 'Selesai & cek bacaan', kind: BK.gold, onPressed: _testStop),
+        HButton(
+            label: 'Selesai & cek bacaan',
+            kind: BK.gold,
+            icon: Icons.stop_rounded,
+            onPressed: _testStop),
       if (mic == MicState.checking) const HButton(label: 'Memeriksa…'),
       if (mic == MicState.idle)
         HButton(
@@ -800,16 +856,10 @@ class _HafalPageState extends State<HafalPage> {
     final kids = <Widget>[_dots(3)];
 
     if (r == null || r.heard.isEmpty || r.total == 0) {
-      kids.add(const HCard(
-        color: kWarnBg,
-        border: Color(0xFFD9A400),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Tidak ada bacaan yang terdeteksi',
-              style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF4A3800))),
-          SizedBox(height: 4),
-          Text('Coba rekam ulang dengan suara lebih jelas.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF4A3800))),
-        ]),
+      kids.add(const StatusNote(
+        kind: SK.warn,
+        title: 'Tidak ada bacaan yang terdeteksi',
+        body: 'Coba rekam ulang dengan suara lebih jelas.',
       ));
       if (!strict) {
         for (var n = from; n <= to; n++) {
@@ -833,13 +883,17 @@ class _HafalPageState extends State<HafalPage> {
       final cnt = r.cnt;
       kids.add(HCard(
         child: Row(children: [
-          Ring(progress: r.acc, label: '${(r.acc * 100).round()}%', size: 96),
-          const SizedBox(width: 12),
+          Ring(
+              progress: r.acc,
+              label: '${(r.acc * 100).round()}%',
+              size: 96,
+              color: r.acc >= kAkurasiUji ? pl.ok : pl.red),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Hasil pengecekan', style: TextStyle(fontWeight: FontWeight.w700)),
+              Text('Hasil pengecekan', style: sans(15, weight: FontWeight.w700)),
               Muted('Kecocokan dari ${r.total} kata', size: 13),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Wrap(spacing: 6, runSpacing: 6, children: [
                 Bdg('${cnt['ok']} benar', kind: 'g'),
                 Bdg('${cnt['bad']} salah', kind: 'r'),
@@ -854,6 +908,7 @@ class _HafalPageState extends State<HafalPage> {
           width: double.infinity,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Muted('Yang terdengar', size: 12),
+            const SizedBox(height: 4),
             Directionality(
               textDirection: TextDirection.rtl,
               child: SizedBox(
@@ -865,11 +920,11 @@ class _HafalPageState extends State<HafalPage> {
         ),
       ));
       kids.add(const Padding(
-        padding: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.only(bottom: 10),
         child: Wrap(spacing: 6, runSpacing: 6, children: [
-          Bdg('Hijau: benar', kind: 'g'),
-          Bdg('Merah: salah', kind: 'r'),
-          Bdg('Kuning: mirip / terlewat', kind: 'y'),
+          Bdg('Hijau: benar', kind: 'g', icon: Icons.check_rounded),
+          Bdg('Merah: salah', kind: 'r', icon: Icons.close_rounded),
+          Bdg('Kuning: mirip / terlewat', kind: 'y', icon: Icons.remove_rounded),
         ]),
       ));
       for (var n = from; n <= to; n++) {
@@ -877,6 +932,7 @@ class _HafalPageState extends State<HafalPage> {
         kids.add(HCard(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             _WordChips(a.ws, big: true),
+            const SizedBox(height: 8),
             Row(children: [
               Expanded(child: Muted('Ayat $n', size: 13)),
               Bdg(a.v == 'g' ? 'Lancar' : (a.v == 'y' ? 'Ragu' : 'Salah'), kind: a.v),
@@ -893,12 +949,11 @@ class _HafalPageState extends State<HafalPage> {
 
     if (strict && !testPass) {
       final pct = r == null ? 0 : (r.acc * 100).round();
-      kids.add(HCard(
-        color: kBadBg,
-        border: pl.red,
-        child: Text(
+      kids.add(const SizedBox(height: 12));
+      kids.add(StatusNote(
+        kind: SK.bad,
+        title:
             'Belum lulus (kecocokan $pct%, minimal ${(kAkurasiUji * 100).round()}%). Kunci tetap aktif sampai kamu lulus uji hafalan.',
-            style: const TextStyle(color: kBadFg, fontWeight: FontWeight.w600)),
       ));
       kids.add(HButton(
         label: 'Baca ulang ayat',
@@ -907,6 +962,7 @@ class _HafalPageState extends State<HafalPage> {
     } else {
       kids.add(HButton(
         label: strict ? 'Lulus! Simpan & buka kunci' : "Simpan & lanjut muraja'ah",
+        icon: Icons.check_rounded,
         onPressed: _finish,
       ));
       kids.add(HButton(
@@ -923,29 +979,28 @@ class _HafalPageState extends State<HafalPage> {
 
   // ---------- Selesai ----------
   Widget _buildDone() {
-    final pl = Pal.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const SizedBox(height: 14),
+      const SizedBox(height: 8),
       HCard(
+        padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
         child: SizedBox(
           width: double.infinity,
           child: Column(children: [
-            Text(aborted ? '🌙' : '✅', style: const TextStyle(fontSize: 50)),
-            Text(aborted ? 'Sesi diakhiri' : 'Sesi selesai', style: serif(19)),
-            const SizedBox(height: 4),
+            RubIcon(aborted ? Icons.bedtime_outlined : Icons.check_rounded, size: 84),
+            const SizedBox(height: 16),
+            Text(aborted ? 'Sesi diakhiri' : 'Sesi selesai', style: serif(24)),
+            const SizedBox(height: 6),
             Muted(
                 aborted
                     ? 'Progres sesi ini tidak disimpan.'
                     : '$count ayat ${surahs[s].n} sudah diproses. Progres hari ini ${app.today}/${app.tgt}.',
                 align: TextAlign.center),
             if (focus != FocusKind.off) ...[
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration:
-                    BoxDecoration(color: pl.line, borderRadius: BorderRadius.circular(10)),
-                child: const Text('Focus Mode dimatikan dan pengaturan fokus dipulihkan.',
-                    style: TextStyle(fontSize: 13)),
+              const SizedBox(height: 14),
+              const StatusNote(
+                kind: SK.info,
+                margin: EdgeInsets.zero,
+                title: 'Focus Mode dimatikan dan pengaturan fokus dipulihkan.',
               ),
             ],
           ]),
@@ -989,14 +1044,14 @@ class _WordChips extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: w.st == 'ok' ? kOkBg : (w.st == 'bad' ? kBadBg : kWarnBg),
-                borderRadius: BorderRadius.circular(9),
+                color: w.st == 'ok' ? pl.okBg : (w.st == 'bad' ? pl.badBg : pl.warnBg),
+                borderRadius: BorderRadius.circular(Rad.tiny + 1),
               ),
               child: Text(
                 w.orig,
                 style: arabic(big ? 24 : 22,
                     height: 1.9,
-                    color: w.st == 'ok' ? kOkFg : (w.st == 'bad' ? kBadFg : kWarnFg)),
+                    color: w.st == 'ok' ? pl.okFg : (w.st == 'bad' ? pl.badFg : pl.warnFg)),
               ),
             ),
         ],
@@ -1012,7 +1067,7 @@ class _ErrLines extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
-    final base = TextStyle(fontSize: 13, color: pl.muted);
+    final base = sans(13, color: pl.muted, height: 1.5);
     final bold = arabic(18, color: pl.text, height: 1.5, weight: FontWeight.w700);
     final lines = <Widget>[];
     for (final w in ws) {
@@ -1040,7 +1095,7 @@ class _ErrLines extends StatelessWidget {
     }
     if (lines.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.only(top: 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: lines),
     );
   }
@@ -1054,26 +1109,36 @@ class _MarkRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pl = Pal.of(context);
-    Widget b(String label, String k, Color bg, Color bc) {
+    Widget b(String label, String k, IconData ic, Color bg, Color fg, Color bc) {
       final on = sel == k;
       return Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(right: 6, top: 6),
-          child: GestureDetector(
-            onTap: () => onPick(k),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: on ? bg : pl.card,
-                border: Border.all(color: on ? bc : pl.line, width: 1.5),
-                borderRadius: BorderRadius.circular(10),
+          padding: const EdgeInsets.only(right: 6, top: 8),
+          child: Semantics(
+            button: true,
+            selected: on,
+            child: Material(
+              color: on ? bg : pl.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(Rad.control),
+                side: BorderSide(color: on ? bc : pl.line, width: 1.5),
               ),
-              child: Text(label,
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: on ? Colors.black87 : pl.text)),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () => onPick(k),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  alignment: Alignment.center,
+                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    if (on) ...[Icon(ic, size: 16, color: fg), const SizedBox(width: 4)],
+                    Flexible(
+                      child: Text(label,
+                          style: sans(12.5, weight: FontWeight.w700, color: on ? fg : pl.text)),
+                    ),
+                  ]),
+                ),
+              ),
             ),
           ),
         ),
@@ -1081,9 +1146,9 @@ class _MarkRow extends StatelessWidget {
     }
 
     return Row(children: [
-      b('Lancar', 'g', kOkBg, pl.ok),
-      b('Ragu', 'y', kWarnBg, pl.yellow),
-      b('Salah', 'r', kBadBg, pl.red),
+      b('Lancar', 'g', Icons.check_rounded, pl.okBg, pl.okFg, pl.ok),
+      b('Ragu', 'y', Icons.remove_rounded, pl.warnBg, pl.warnFg, pl.yellow),
+      b('Salah', 'r', Icons.close_rounded, pl.badBg, pl.badFg, pl.red),
     ]);
   }
 }

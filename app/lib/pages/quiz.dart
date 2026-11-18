@@ -215,7 +215,7 @@ class _QuizPageState extends State<QuizPage> {
       body = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Mushaf(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 50),
+            constraints: const BoxConstraints(minHeight: 56),
             child: Directionality(
               textDirection: TextDirection.rtl,
               child: seq.isEmpty
@@ -235,23 +235,23 @@ class _QuizPageState extends State<QuizPage> {
                 _wordChip(q.ws[x], answered ? null : () => setState(() => seq.add(x)), pl),
           ]),
         ),
+        const SizedBox(height: 8),
         if (answered)
-          HCard(
-            color: sel == 1 ? kOkBg : kBadBg,
-            child: Column(children: [
-              Text(sel == 1 ? 'Benar' : 'Kurang tepat',
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF222222))),
-              Directionality(
-                textDirection: TextDirection.rtl,
-                child: Text(q.ans,
-                    textAlign: TextAlign.center,
-                    style: arabic(24, color: const Color(0xFF222222))),
-              ),
-            ]),
+          StatusNote(
+            kind: sel == 1 ? SK.ok : SK.bad,
+            title: sel == 1 ? 'Benar' : 'Kurang tepat',
+            body: sel == 1 ? null : 'Susunan yang benar ada di bawah.',
+          ),
+        if (answered)
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: Text(q.ans,
+                textAlign: TextAlign.center, style: arabic(24, color: pl.text, height: 1.9)),
           )
         else
           HButton(
             label: 'Periksa',
+            icon: Icons.check_rounded,
             onPressed: seq.length == q.ws.length
                 ? () => setState(() {
                       final right = seq.map((x) => q.ws[x]).join(' ') == q.ans;
@@ -262,107 +262,125 @@ class _QuizPageState extends State<QuizPage> {
           ),
       ]);
     }
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            PageHeader(quizNames[widget.kind] ?? 'Kuis'),
-            Row(children: [
-              Muted('Soal ${i + 1}/${l.length}', size: 13),
-              const Spacer(),
-              if (tm) ...[
-                Bdg('⏱ ${left}d', kind: 'y'),
-                const SizedBox(width: 6),
-                Bdg('Streak $st', kind: 'g'),
-                const SizedBox(width: 6),
-                Bdg('Benar $ok'),
-              ],
-            ]),
-            HBar((i + 1) / l.length),
-            Text(q.q, style: const TextStyle(fontWeight: FontWeight.w700)),
-            if (q.ar != null)
-              Mushaf(
-                child: Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Text(q.ar!,
-                      textAlign: TextAlign.center, style: arabic(app.arabicSize, color: pl.text)),
-                ),
-              ),
-            body,
-            if (answered)
-              HButton(
-                label: i + 1 >= l.length ? 'Lihat hasil' : 'Lanjut',
-                onPressed: () {
-                  if (i + 1 >= l.length) {
-                    _fin();
-                  } else {
-                    setState(() {
-                      i++;
-                      sel = null;
-                      seq = [];
-                    });
-                  }
-                },
-              ),
+    return PageScaffold(
+      children: [
+        PageHeader(quizNames[widget.kind] ?? 'Kuis'),
+        Row(children: [
+          Expanded(child: Muted('Soal ${i + 1} dari ${l.length}', size: 13)),
+          if (tm) ...[
+            Bdg('${left}d', kind: 'y', icon: Icons.timer_outlined),
+            const SizedBox(width: 6),
+            Bdg('Streak $st', kind: 'g'),
+            const SizedBox(width: 6),
+            Bdg('Benar $ok'),
           ],
-        ),
-      ),
+        ]),
+        HBar((i + 1) / l.length),
+        const SizedBox(height: 6),
+        Text(q.q, style: sans(16.5, weight: FontWeight.w700, height: 1.35)),
+        if (q.ar != null)
+          Mushaf(
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Text(q.ar!,
+                  textAlign: TextAlign.center, style: arabic(app.arabicSize, color: pl.text)),
+            ),
+          ),
+        body,
+        if (answered)
+          HButton(
+            label: i + 1 >= l.length ? 'Lihat hasil' : 'Soal berikutnya',
+            onPressed: () {
+              if (i + 1 >= l.length) {
+                _fin();
+              } else {
+                setState(() {
+                  i++;
+                  sel = null;
+                  seq = [];
+                });
+              }
+            },
+          ),
+      ],
     );
   }
 
   Widget _wordChip(String w, VoidCallback? onTap, Pal pl) => Padding(
-        padding: const EdgeInsets.all(3),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: pl.card,
-              border: Border.all(color: pl.line, width: 1.5),
-              borderRadius: BorderRadius.circular(99),
+        padding: const EdgeInsets.all(4),
+        child: Material(
+          color: pl.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Rad.control),
+            side: BorderSide(color: pl.line, width: 1.5),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+              child: Text(w, style: arabic(24, color: pl.text, height: 1.6)),
             ),
-            child: Text(w, style: arabic(24, color: pl.text, height: 1.6)),
           ),
         ),
       );
 
   Widget _opt(Pal pl, Question q, int x, bool answered) {
     Color bg = pl.card, bc = pl.line, fg = pl.text;
+    IconData? mark;
     if (answered && x == q.a) {
-      bg = kOkBg;
+      bg = pl.okBg;
       bc = pl.ok;
-      fg = kOkFg;
+      fg = pl.okFg;
+      mark = Icons.check_circle_rounded;
     } else if (answered && x == sel) {
-      bg = kBadBg;
+      bg = pl.badBg;
       bc = pl.red;
-      fg = kBadFg;
+      fg = pl.badFg;
+      mark = Icons.cancel_rounded;
     }
     final isAr = q.o[x].runes.any((r) => r >= 0x0600 && r <= 0x06FF);
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: GestureDetector(
-        onTap: answered
-            ? null
-            : () => setState(() {
-                  sel = x;
-                  _score(x == q.a, q);
-                }),
-        child: Container(
-          padding: const EdgeInsets.all(13),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: bg,
-            border: Border.all(color: bc, width: 1.5),
+      padding: const EdgeInsets.only(top: 10),
+      child: Semantics(
+        button: true,
+        enabled: !answered,
+        child: Material(
+          color: bg,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: bc, width: 1.5),
           ),
-          child: Directionality(
-            textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
-            child: Text(q.o[x],
-                textAlign: TextAlign.center,
-                style: isAr
-                    ? arabic(24, color: fg, height: 1.8)
-                    : TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: fg)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: answered
+                ? null
+                : () => setState(() {
+                      sel = x;
+                      _score(x == q.a, q);
+                    }),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 58),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Row(children: [
+                  if (mark != null) const SizedBox(width: 26),
+                  Expanded(
+                    child: Directionality(
+                      textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+                      child: Text(q.o[x],
+                          textAlign: TextAlign.center,
+                          style: isAr
+                              ? arabic(24, color: fg, height: 1.8)
+                              : sans(15, weight: FontWeight.w600, color: fg)),
+                    ),
+                  ),
+                  if (mark != null) Icon(mark, size: 26, color: fg),
+                ]),
+              ),
+            ),
           ),
         ),
       ),
@@ -383,89 +401,97 @@ class QuizResultPage extends StatelessWidget {
     final pass = ex && pc >= 60;
     final topics = r.bad.map((x) => x.top).toSet().toList();
     final tm = r.kind == 'tantang';
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            HCard(
-              child: SizedBox(
-                width: double.infinity,
-                child: Column(children: [
-                  Muted(quizNames[r.kind] ?? '', size: 13),
-                  Text(tm ? '${r.ok * 10 + r.best * 2} poin' : '$pc%', style: serif(46)),
-                  Text(
-                      '${r.ok} benar · ${r.no} salah${tm ? ' · ${r.total - r.ok - r.no} tidak sempat' : ''} · ${mm(r.dur)}${tm ? ' · streak terbaik ${r.best}' : ''}',
-                      textAlign: TextAlign.center),
-                  if (ex) ...[
-                    const SizedBox(height: 6),
-                    Bdg(pass ? 'Lulus' : 'Belum lulus', kind: pass ? 'g' : 'r'),
-                  ],
-                ]),
-              ),
-            ),
-            const H4('Materi yang perlu dipelajari'),
-            HCard(
-              child: topics.isEmpty
-                  ? const Muted('Tidak ada. Bagus!')
-                  : Wrap(spacing: 6, runSpacing: 6, children: [
-                      for (final x in topics) Bdg(x, kind: 'y'),
-                    ]),
-            ),
-            if (r.bad.isNotEmpty) ...[
-              const H4('Pelajari kesalahan'),
-              for (final x in r.bad)
-                HCard(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    if ((x.ar ?? '').isNotEmpty || x.ans.isNotEmpty)
-                      SizedBox(
-                        width: double.infinity,
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(x.ar ?? x.ans,
-                              textAlign: TextAlign.center,
-                              style: arabic(22, color: pl.text, height: 1.8)),
-                        ),
-                      ),
-                    Muted(x.q, size: 13),
-                    const SizedBox(height: 4),
-                    Text('Jawaban benar:', style: TextStyle(color: pl.muted)),
-                    Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Text(x.susun ? x.ans : x.o[x.a],
-                          style: arabic(20, color: pl.text, height: 1.6, weight: FontWeight.w700)),
-                    ),
-                  ]),
-                ),
+    return PageScaffold(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(22),
+          decoration:
+              BoxDecoration(color: pl.green2, borderRadius: BorderRadius.circular(Rad.hero)),
+          child: Column(children: [
+            Text(quizNames[r.kind] ?? '',
+                style: sans(13, weight: FontWeight.w600, color: pl.onHero.withValues(alpha: .85))),
+            const SizedBox(height: 6),
+            Text(tm ? '${r.ok * 10 + r.best * 2} poin' : '$pc%',
+                style: serif(54, color: pl.onHero)),
+            const SizedBox(height: 8),
+            Text(
+                '${r.ok} benar · ${r.no} salah${tm ? ' · ${r.total - r.ok - r.no} tidak sempat' : ''} · ${mm(r.dur)}${tm ? ' · streak terbaik ${r.best}' : ''}',
+                textAlign: TextAlign.center,
+                style: sans(13.5, color: pl.onHero, height: 1.45)),
+            if (ex) ...[
+              const SizedBox(height: 12),
+              Bdg(pass ? 'Lulus' : 'Belum lulus',
+                  kind: pass ? 'g' : 'r',
+                  icon: pass ? Icons.check_rounded : Icons.close_rounded),
             ],
-            if (pass)
-              HButton(
-                  label: 'Lihat sertifikat',
-                  kind: BK.gold,
-                  onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute<void>(builder: (_) => const CertPage(index: 0)))),
-            HButton(
-                label: 'Coba lagi',
-                onPressed: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute<void>(builder: (_) => QuizPage(kind: r.kind)))),
-            HButton(
-              label: ex ? 'Kembali ke Sertifikasi' : 'Kembali ke LCC',
-              kind: BK.outline,
-              onPressed: () {
-                final nav = Navigator.of(context);
-                nav.pop();
-                if (ex) nav.pop();
-              },
-            ),
-            if (r.bad.any((x) => hukumPilihan.contains(x.top)))
-              HButton(
-                  label: 'Pelajari tajwid',
-                  kind: BK.outline,
-                  onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute<void>(builder: (_) => const TajwidPage()))),
-          ],
+          ]),
         ),
-      ),
+        const H4('Materi yang perlu dipelajari'),
+        HCard(
+          child: topics.isEmpty
+              ? const Muted('Tidak ada. Bagus!')
+              : Wrap(spacing: 8, runSpacing: 8, children: [
+                  for (final x in topics) Bdg(x, kind: 'y'),
+                ]),
+        ),
+        if (r.bad.isNotEmpty) ...[
+          const H4('Pelajari kesalahan'),
+          for (final x in r.bad)
+            HCard(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if ((x.ar ?? '').isNotEmpty || x.ans.isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(x.ar ?? x.ans,
+                          textAlign: TextAlign.center,
+                          style: arabic(22, color: pl.text, height: 1.8)),
+                    ),
+                  ),
+                Muted(x.q, size: 13),
+                const SizedBox(height: 6),
+                Text('Jawaban benar', style: sans(12.5, weight: FontWeight.w700, color: pl.muted)),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(x.susun ? x.ans : x.o[x.a],
+                        style: arabic(20, color: pl.text, height: 1.6, weight: FontWeight.w700)),
+                  ),
+                ),
+              ]),
+            ),
+        ],
+        if (pass)
+          HButton(
+              label: 'Lihat sertifikat',
+              kind: BK.gold,
+              icon: Icons.workspace_premium_outlined,
+              onPressed: () => Navigator.of(context).pushReplacement(
+                  MaterialPageRoute<void>(builder: (_) => const CertPage(index: 0)))),
+        HButton(
+            label: 'Coba lagi',
+            icon: Icons.replay_rounded,
+            onPressed: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute<void>(builder: (_) => QuizPage(kind: r.kind)))),
+        HButton(
+          label: ex ? 'Kembali ke Sertifikasi' : 'Kembali ke LCC',
+          kind: BK.outline,
+          onPressed: () {
+            final nav = Navigator.of(context);
+            nav.pop();
+            if (ex) nav.pop();
+          },
+        ),
+        if (r.bad.any((x) => hukumPilihan.contains(x.top)))
+          HButton(
+              label: 'Pelajari tajwid',
+              kind: BK.outline,
+              onPressed: () => Navigator.of(context).pushReplacement(
+                  MaterialPageRoute<void>(builder: (_) => const TajwidPage()))),
+      ],
     );
   }
 }
@@ -508,49 +534,63 @@ class _SertifikasiPageState extends State<SertifikasiPage> {
               ["Muraja'ah rutin 7 hari berturut-turut", false],
             ];
             final dn = reqs.where((x) => x[1] == true).length;
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+            return PageList(
               children: [
                 const PageHeader('Sertifikasi'),
-                HCard(
-                  border: pl.gold,
-                  child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Sertifikasi kompetensi internal',
-                        style: TextStyle(fontWeight: FontWeight.w700)),
-                    SizedBox(height: 4),
-                    Muted(
-                        "Program penilaian kemampuan hafalan di focusHifz. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum."),
-                  ]),
+                const StatusNote(
+                  kind: SK.info,
+                  title: 'Sertifikasi kompetensi internal',
+                  body:
+                      "Program penilaian kemampuan hafalan di HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an. Jenjang dapat berubah sesuai kurikulum.",
                 ),
                 const H4('Jenjang'),
                 for (var i = 0; i < _levels.length; i++)
-                  HCard(
-                    border: sl == i ? pl.green : null,
-                    onTap: () => setState(() => sl = i),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [
-                        Expanded(
-                            child: Text(_levels[i].n,
-                                style: const TextStyle(fontWeight: FontWeight.w700))),
-                        if (_levels[i].lock)
-                          const Bdg('Segera')
-                        else if (app.certs.any((c) => c.lv == i))
-                          const Bdg('Diraih', kind: 'g')
-                        else
-                          const Bdg('Terbuka', kind: 'y'),
+                  Semantics(
+                    selected: sl == i,
+                    child: HCard(
+                      border: sl == i ? pl.green : null,
+                      onTap: () => setState(() => sl = i),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Expanded(
+                              child: Text(_levels[i].n, style: sans(15, weight: FontWeight.w700))),
+                          const SizedBox(width: 8),
+                          if (_levels[i].lock)
+                            const Bdg('Segera', icon: Icons.lock_outline_rounded)
+                          else if (app.certs.any((c) => c.lv == i))
+                            const Bdg('Diraih', kind: 'g', icon: Icons.check_rounded)
+                          else
+                            const Bdg('Terbuka', kind: 'y'),
+                        ]),
+                        const SizedBox(height: 4),
+                        Muted(_levels[i].d),
                       ]),
-                      Muted(_levels[i].d),
-                    ]),
+                    ),
                   ),
                 if (!lv.lock) ...[
-                  const H4('Persyaratan & progres'),
+                  const H4('Persyaratan dan progres'),
                   HCard(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(children: [
+                        Expanded(child: Muted('$dn dari ${reqs.length} terpenuhi', size: 13)),
+                      ]),
                       HBar(dn / reqs.length),
+                      const SizedBox(height: 4),
                       for (final x in reqs)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Text('${x[1] == true ? '✅' : '⬜'} ${x[0]}'),
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Icon(
+                                x[1] == true
+                                    ? Icons.check_circle_rounded
+                                    : Icons.radio_button_unchecked_rounded,
+                                size: 22,
+                                color: x[1] == true ? pl.ok : pl.muted),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text('${x[0]}', style: sans(14, height: 1.4)),
+                            ),
+                          ]),
                         ),
                     ]),
                   ),
@@ -560,22 +600,35 @@ class _SertifikasiPageState extends State<SertifikasiPage> {
                 ],
                 const H4('Riwayat ujian'),
                 if (app.hist.isEmpty)
-                  const HCard(child: Muted('Belum ada ujian. Mulai dari Level 1.', align: TextAlign.center))
+                  const HCard(
+                    child: EmptyState(
+                      icon: Icons.history_edu_outlined,
+                      title: 'Belum ada ujian',
+                      body: 'Mulai dari Level 1.',
+                    ),
+                  )
                 else
                   for (final x in app.hist)
                     HCard(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(x.t, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        Text(x.t, style: sans(15, weight: FontWeight.w700)),
+                        const SizedBox(height: 2),
                         Muted('${x.r} · ${x.d}'),
                       ]),
                     ),
                 const H4('Sertifikat saya'),
                 if (app.certs.isEmpty)
-                  const HCard(child: Muted('Belum ada sertifikat.', align: TextAlign.center))
+                  const HCard(
+                    child: EmptyState(
+                      icon: Icons.workspace_premium_outlined,
+                      title: 'Belum ada sertifikat',
+                      body: 'Lulus ujian sambung ayat untuk menerbitkan sertifikat contoh.',
+                    ),
+                  )
                 else
                   for (var i = 0; i < app.certs.length; i++)
                     NavCard(
-                      emoji: '🎓',
+                      icon: Icons.workspace_premium_outlined,
                       title: _levels[app.certs[i].lv].n,
                       sub: '${app.certs[i].no} · ${app.certs[i].d}',
                       onTap: () => pushPage(context, CertPage(index: i)),
@@ -595,28 +648,32 @@ class UjianPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void pv() => toast(context, 'Preview: belum terhubung ke backend');
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            const PageHeader('Ujian Level 1'),
-            const Muted('Pilih jenis ujian. Lulus ujian sambung ayat (≥60%) menerbitkan sertifikat contoh.'),
-            const SizedBox(height: 10),
-            NavCard(
-                title: 'Ujian sambung ayat',
-                sub: '5 soal sambung ayat. Sudah berfungsi.',
-                onTap: () => pushPage(context, const QuizPage(kind: 'ujian'))),
-            NavCard(title: 'Ujian hafalan', sub: 'Setor hafalan ke penguji. Preview.', onTap: pv),
-            NavCard(
-                title: 'Ujian kelancaran', sub: 'Penilaian kelancaran bacaan. Preview.', onTap: pv),
-            NavCard(
-                title: 'Penilaian penguji manusia',
-                sub: 'Penguji menilai rekaman Anda. Preview.',
-                onTap: pv),
-          ],
-        ),
-      ),
+    return PageScaffold(
+      children: [
+        const PageHeader('Ujian Level 1'),
+        const Muted('Pilih jenis ujian. Lulus ujian sambung ayat (≥60%) menerbitkan sertifikat contoh.'),
+        const SizedBox(height: 14),
+        NavCard(
+            icon: Icons.link_rounded,
+            title: 'Ujian sambung ayat',
+            sub: '5 soal sambung ayat. Sudah berfungsi.',
+            onTap: () => pushPage(context, const QuizPage(kind: 'ujian'))),
+        NavCard(
+            icon: Icons.record_voice_over_outlined,
+            title: 'Ujian hafalan',
+            sub: 'Setor hafalan ke penguji. Preview.',
+            onTap: pv),
+        NavCard(
+            icon: Icons.speed_rounded,
+            title: 'Ujian kelancaran',
+            sub: 'Penilaian kelancaran bacaan. Preview.',
+            onTap: pv),
+        NavCard(
+            icon: Icons.person_search_outlined,
+            title: 'Penilaian penguji manusia',
+            sub: 'Penguji menilai rekaman Anda. Preview.',
+            onTap: pv),
+      ],
     );
   }
 }
@@ -627,55 +684,79 @@ class CertPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = app.certs[clampI(index, 0, app.certs.length - 1)];
-    const ink = Color(0xFF2B2410);
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-          children: [
-            const PageHeader('Sertifikat'),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFDF3),
-                border: Border.all(color: Pal.light.gold, width: 3),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: DefaultTextStyle(
-                style: const TextStyle(color: ink, fontSize: 15),
-                textAlign: TextAlign.center,
-                child: Column(children: [
-                  const Text('focusHifz · Sertifikat kompetensi internal',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF667A71))),
-                  const SizedBox(height: 10),
-                  Text('Sertifikat Kompetensi', style: serif(24, color: Pal.light.green2)),
-                  const SizedBox(height: 10),
-                  const Text('diberikan kepada'),
-                  Text(app.name, style: serif(24, color: ink)),
-                  const SizedBox(height: 6),
-                  Text('atas capaian ${_levels[c.lv].n}'),
-                  Text('Tanggal terbit: ${c.d}'),
-                  Text('Nomor: ${c.no} (contoh)'),
-                  const SizedBox(height: 10),
-                  SizedBox(width: 96, height: 96, child: CustomPaint(painter: _QrPainter(c.no))),
-                  const SizedBox(height: 6),
-                  const Text('QR contoh, belum terhubung ke layanan verifikasi',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF667A71))),
-                ]),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Muted(
-                "Sertifikat ini adalah sertifikasi kompetensi internal focusHifz. Bukan ijazah dan bukan sanad Al-Qur'an.",
-                size: 13),
-            HButton(
-                label: 'Bagikan (preview)',
-                kind: BK.outline,
-                onPressed: () => toast(context, 'Preview: belum terhubung ke backend')),
-          ],
+    if (app.certs.isEmpty) {
+      return const PageScaffold(children: [
+        PageHeader('Sertifikat'),
+        EmptyState(
+          icon: Icons.workspace_premium_outlined,
+          title: 'Belum ada sertifikat',
+          body: 'Lulus ujian sambung ayat untuk menerbitkan sertifikat contoh.',
         ),
-      ),
+      ]);
+    }
+    final c = app.certs[clampI(index, 0, app.certs.length - 1)];
+    // Sertifikat adalah dokumen kertas: warnanya tetap krem dengan tinta gelap di kedua tema.
+    const ink = Color(0xFF2B2410);
+    const inkSoft = Color(0xFF56695F);
+    return PageScaffold(
+      children: [
+        const PageHeader('Sertifikat'),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFFDF3),
+            border: Border.all(color: Pal.light.gold, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Pal.light.line),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: DefaultTextStyle(
+              style: sans(15, color: ink, height: 1.45),
+              textAlign: TextAlign.center,
+              child: Column(children: [
+                RubBadge(
+                  size: 60,
+                  fill: Pal.light.green2,
+                  child: Icon(Icons.workspace_premium_outlined,
+                      size: 28, color: Pal.light.gold),
+                ),
+                const SizedBox(height: 10),
+                Text('HifzFlow · Sertifikat kompetensi internal',
+                    style: sans(12, color: inkSoft)),
+                const SizedBox(height: 12),
+                Text('Sertifikat Kompetensi', style: serif(26, color: Pal.light.green2)),
+                const SizedBox(height: 12),
+                const Text('diberikan kepada'),
+                const SizedBox(height: 2),
+                Text(app.name, style: serif(26, color: ink)),
+                const SizedBox(height: 8),
+                Text('atas capaian ${_levels[c.lv].n}'),
+                Text('Tanggal terbit: ${c.d}'),
+                Text('Nomor: ${c.no} (contoh)'),
+                const SizedBox(height: 14),
+                SizedBox(width: 96, height: 96, child: CustomPaint(painter: _QrPainter(c.no))),
+                const SizedBox(height: 8),
+                Text('QR contoh, belum terhubung ke layanan verifikasi',
+                    style: sans(12, color: inkSoft)),
+              ]),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        const Muted(
+            "Sertifikat ini adalah sertifikasi kompetensi internal HifzFlow. Bukan ijazah dan bukan sanad Al-Qur'an.",
+            size: 13),
+        HButton(
+            label: 'Bagikan (preview)',
+            kind: BK.outline,
+            icon: Icons.ios_share_rounded,
+            onPressed: () => toast(context, 'Preview: belum terhubung ke backend')),
+      ],
     );
   }
 }

@@ -36,7 +36,7 @@ jobs:
           M=android/app/src/main/AndroidManifest.xml
           sed -i '/<manifest/a <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.INTERNET"/>' $M
           if grep -q '<queries>' $M; then sed -i '/<queries>/a <intent><action android:name="android.speech.RecognitionService"/></intent>' $M; fi
-          sed -i 's/android:label="fokus_hafalan"/android:label="focusHifz"/' $M
+          sed -i 's/android:label="fokus_hafalan"/android:label="HifzFlow"/' $M
 
       - name: Build APK
         run: flutter build apk --release

@@ -1,8 +1,10 @@
-# focusHifz
+# HifzFlow
 
 Struktur:
 
 - `app/lib/` : kode Flutter (UI/UX HifzFlow, hafalan, LCC, tajwid, sertifikasi)
+- `DESIGN.md` : arah desain, token, dan alasan tiap keputusan visual (redesign)
+- `antislop.md` : aturan desain yang dipatuhi selama redesign
 - `app/MainActivity.kt` : kunci layar (pin), Jangan Ganggu, status (kode Focus Mode milikmu, tidak diubah)
 - `.github/workflows/build.yml` : build APK otomatis (push ke `main` → APK di tab Releases)
 - `*.html` : prototype/Figma asli (referensi)
