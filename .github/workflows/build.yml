@@ -20,8 +20,8 @@ jobs:
       - name: Generate Android scaffold and apply app code
         run: |
           flutter create --org com.fokus --project-name fokus_hafalan --platforms android .
-          # google_fonts 9 uses material_ui.TextTheme; this app uses Flutter's TextTheme.
-          flutter pub add speech_to_text:^7.0.0 google_fonts:8.2.1 http path_provider just_audio
+          # theme.dart tidak lagi memakai GoogleFonts.interTextTheme, jadi google_fonts terbaru aman.
+          flutter pub add speech_to_text:^7.0.0 google_fonts http path_provider just_audio
           rm -f test/widget_test.dart
           rm -rf lib && mkdir lib
           cp -r app/lib/. lib/
@@ -31,7 +31,16 @@ jobs:
           sed -i '/<manifest/a <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.INTERNET"/>' $M
           if grep -q '<queries>' $M; then sed -i '/<queries>/a <intent><action android:name="android.speech.RecognitionService"/></intent>' $M; fi
           sed -i 's/android:label="fokus_hafalan"/android:label="HifzFlow"/' $M
-      - run: flutter build apk --release
+      # Maven Central kadang membalas 429 (Too Many Requests) ke runner GitHub.
+      # Ulangi build sampai 3 kali dengan jeda supaya gangguan jaringan sesaat tidak menggagalkan rilis.
+      - name: Build APK
+        run: |
+          for i in 1 2 3; do
+            if flutter build apk --release; then exit 0; fi
+            echo "Build gagal (percobaan $i dari 3), coba lagi dalam 90 detik"
+            sleep 90
+          done
+          exit 1
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}

@@ -88,6 +88,33 @@ WidgetStateProperty<BorderSide?> focusSide(Pal pl, [BorderSide? normal]) =>
     WidgetStateProperty.resolveWith<BorderSide?>(
         (s) => s.contains(WidgetState.focused) ? BorderSide(color: pl.focus, width: 3) : normal);
 
+/// Inter untuk semua gaya teks Material.
+///
+/// Sengaja tidak memakai GoogleFonts.interTextTheme(): sejak Flutter 3.50 google_fonts 9
+/// memakai TextTheme dari paket material_ui, beda tipe dengan TextTheme Flutter, sehingga
+/// build gagal. GoogleFonts.inter(textStyle:) hanya menukar TextStyle, jadi aman di
+/// google_fonts versi lama maupun baru.
+TextTheme interTextTheme(TextTheme t) {
+  TextStyle? f(TextStyle? s) => s == null ? null : GoogleFonts.inter(textStyle: s);
+  return t.copyWith(
+    displayLarge: f(t.displayLarge),
+    displayMedium: f(t.displayMedium),
+    displaySmall: f(t.displaySmall),
+    headlineLarge: f(t.headlineLarge),
+    headlineMedium: f(t.headlineMedium),
+    headlineSmall: f(t.headlineSmall),
+    titleLarge: f(t.titleLarge),
+    titleMedium: f(t.titleMedium),
+    titleSmall: f(t.titleSmall),
+    bodyLarge: f(t.bodyLarge),
+    bodyMedium: f(t.bodyMedium),
+    bodySmall: f(t.bodySmall),
+    labelLarge: f(t.labelLarge),
+    labelMedium: f(t.labelMedium),
+    labelSmall: f(t.labelSmall),
+  );
+}
+
 ThemeData buildTheme(Brightness b) {
   final pl = b == Brightness.dark ? Pal.dark : Pal.light;
   final base = ThemeData(
@@ -106,8 +133,9 @@ ThemeData buildTheme(Brightness b) {
   );
   return base.copyWith(
     // Teks UI pakai Inter, mengikuti prototype Figma.
-    textTheme: GoogleFonts.interTextTheme(base.textTheme)
-        .apply(bodyColor: pl.text, displayColor: pl.text),
+    // textTheme: GoogleFonts.interTextTheme(base.textTheme)
+    //     .apply(bodyColor: pl.text, displayColor: pl.text), // gagal build di Flutter 3.50
+    textTheme: interTextTheme(base.textTheme).apply(bodyColor: pl.text, displayColor: pl.text),
     snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
     filledButtonTheme: FilledButtonThemeData(style: ButtonStyle(side: focusSide(pl))),
     textButtonTheme: TextButtonThemeData(style: ButtonStyle(side: focusSide(pl))),
